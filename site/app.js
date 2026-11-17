@@ -2,6 +2,8 @@
 const $ = (id) => document.getElementById(id);
 const CW = window.CodeWidget;
 const REPO = "https://github.com/thomaslrw/CodeWidget";
+// Replaced with the commit on publish, so browsers always fetch the newest examples.
+const V = "dev";
 const FILES = {
   macArm: "CodeWidget-mac-arm64.dmg",
   macIntel: "CodeWidget-mac-x64.dmg",
@@ -265,7 +267,7 @@ async function loadExamples() {
   for (const ex of EXAMPLES) {
     let source = "";
     try {
-      source = await (await fetch(ex.file)).text();
+      source = await (await fetch(`${ex.file}?v=${V}`)).text();
     } catch {
       continue;
     }
@@ -312,7 +314,7 @@ const DRAFT_SIZE = "cw-draft-size";
     setPreset(w, h);
   } else {
     try {
-      code.value = await (await fetch(EXAMPLES[0].file)).text();
+      code.value = await (await fetch(`${EXAMPLES[0].file}?v=${V}`)).text();
       $("name").value = EXAMPLES[0].name;
     } catch {
       code.value = "";
