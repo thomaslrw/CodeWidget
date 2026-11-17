@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CodeWidget</title>
+<link rel="stylesheet" href="editor.css">
+</head>
+<body>
+<header>
+  <div class="brand">CodeWidget</div>
+  <input id="name" class="field name" placeholder="Widget name" maxlength="60" spellcheck="false">
+  <div class="size">
+    <select id="preset" class="field" title="Widget size">
+      <option value="200x200">Small 200 x 200</option>
+      <option value="400x200" selected>Medium 400 x 200</option>
+      <option value="400x400">Large 400 x 400</option>
+      <option value="640x240">Wide 640 x 240</option>
+      <option value="300x600">Tall 300 x 600</option>
+      <option value="custom">Custom</option>
+    </select>
+    <input id="width" class="field num" type="number" min="60" max="4000" value="400" title="Width">
+    <span class="x">x</span>
+    <input id="height" class="field num" type="number" min="60" max="4000" value="200" title="Height">
+  </div>
+  <div class="spacer"></div>
+  <button id="prompt" class="btn" title="Copy a prompt to paste into Claude or ChatGPT">Copy AI prompt</button>
+  <button id="cancel" class="btn" hidden>Cancel edit</button>
+  <button id="add" class="btn primary">Add widget</button>
+</header>
+
+<main>
+  <section class="pane code">
+    <div class="pane-head">
+      <span>Code</span>
+      <span class="hint">Paste HTML, CSS and JavaScript. Code copied straight from an AI chat works too.</span>
+      <button id="clear" class="link">Clear</button>
+    </div>
+    <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste your widget code here"></textarea>
+  </section>
+  <section class="pane preview">
+    <div class="pane-head">
+      <span>Preview</span>
+      <span class="hint" id="previewSize">400 x 200</span>
+      <button id="reload" class="link">Reload</button>
+    </div>
+    <div class="stage" id="stage">
+      <div class="frame" id="frameBox">
+        <iframe id="preview" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" title="Preview"></iframe>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="list-head">
+    <span>Your widgets</span>
+    <label class="login"><input type="checkbox" id="login"> Open at login</label>
+  </div>
+  <div id="list" class="list"></div>
+</footer>
+
+<div id="toast" class="toast" hidden></div>
+<script src="editor.js"></script>
+</body>
+</html>

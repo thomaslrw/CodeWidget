@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Widget</title>
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; }
+  /* Controls appear only while the pointer is over the widget. */
+  .bar {
+    position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 2px; padding: 2px;
+    background: rgba(20,20,20,0.88); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px;
+    opacity: 0; transition: opacity .15s; z-index: 10;
+    font: 11px -apple-system, "Segoe UI", system-ui, sans-serif; color: #eee;
+  }
+  body:hover .bar, .bar.on { opacity: 1; }
+  .grip { -webkit-app-region: drag; cursor: grab; padding: 3px 8px; color: #aaa; letter-spacing: 1px; user-select: none; }
+  .bar button {
+    -webkit-app-region: no-drag; background: none; border: 0; color: #ddd; cursor: pointer;
+    padding: 3px 7px; border-radius: 5px; font: inherit;
+  }
+  .bar button:hover { background: rgba(255,255,255,0.12); }
+  .bar button.active { background: #eee; color: #111; }
+  .resize {
+    position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; z-index: 10;
+    opacity: 0; transition: opacity .15s;
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0.55) 60%, transparent 60%, transparent 70%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0.55) 80%, transparent 80%);
+  }
+  body:hover .resize { opacity: 1; }
+  body.resizing iframe { pointer-events: none; }
+</style>
+</head>
+<body>
+<iframe id="w" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-write; fullscreen"></iframe>
+<div class="bar" id="bar">
+  <span class="grip" title="Drag to move">::: move</span>
+  <button id="top" title="Keep above other windows">Pin</button>
+  <button id="edit" title="Edit this widget">Edit</button>
+  <button id="hide" title="Hide (bring back from the menu bar icon)">Hide</button>
+</div>
+<div class="resize" id="resize" title="Drag to resize"></div>
+<script src="widget.js"></script>
+</body>
+</html>
