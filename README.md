@@ -4,6 +4,8 @@ Paste any widget code, preview it instantly and pin it to your desktop.
 
 Ask Claude or ChatGPT for a widget, paste the code in, press **Add widget**. That's it. No account, no setup, free and open source.
 
+**Try it in your browser: [thomaslrw.github.io/CodeWidget](https://thomaslrw.github.io/CodeWidget/)**. Paste code, see it live, then get the app to put it on your desktop. CodeWidget is for desktop computers, not phones.
+
 - **Paste and preview.** Code on the left, a live preview at the real size on the right.
 - **Any code from any AI.** HTML, CSS and JavaScript in one file. Code copied straight from a chat, fences and all, works.
 - **Fully interactive.** Buttons, inputs, clicks, animations, fetching from the web.
@@ -97,6 +99,8 @@ npm run dist       # build an app for your computer into dist/
 ```
 
 Every pull request is built for Mac, Windows and Linux by GitHub Actions, and every version merged to `main` is published to Releases. To publish a new version, bump `version` in `package.json`.
+
+The website lives in `site/` and is published to GitHub Pages on every push to `main` (it uses `src/code.js` too, so the preview matches the app). To try it locally, copy `src/code.js` and `assets/icon.png` into `site/` and open `site/index.html`.
 
 ## Licence
 

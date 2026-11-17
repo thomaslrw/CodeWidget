@@ -1,0 +1,255 @@
+// The website: paste code, preview it live, then download the app and send the widget straight into it.
+const $ = (id) => document.getElementById(id);
+const CW = window.CodeWidget;
+const REPO = "https://github.com/thomaslrw/CodeWidget";
+const FILES = {
+  macArm: "CodeWidget-mac-arm64.dmg",
+  macIntel: "CodeWidget-mac-x64.dmg",
+  windows: "CodeWidget-windows-x64-setup.exe",
+  linux: "CodeWidget-linux-x86_64.AppImage",
+};
+const fileUrl = (f) => `${REPO}/releases/latest/download/${f}`;
+
+const EXAMPLE = `<!-- An example widget: a clock. Replace this with your own code. -->
+<div class="clock">
+  <div id="time">00:00</div>
+  <div id="date"></div>
+</div>
+<style>
+  .clock {
+    height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(12, 12, 12, 0.85); color: #fff; border-radius: 22px;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+  }
+  #time { font-size: 64px; font-weight: 700; letter-spacing: -2px; }
+  #date { font-size: 15px; color: #9a9a9a; margin-top: 4px; }
+</style>
+<script>
+  function tick() {
+    const now = new Date();
+    document.getElementById("time").textContent =
+      now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    document.getElementById("date").textContent =
+      now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>`;
+
+const PROMPT = (w, h) =>
+  `Make me a desktop widget as ONE self-contained HTML file: HTML, CSS and JavaScript all inline, no build step. ` +
+  `You can load libraries from a CDN if needed. It will be shown in a ${w} x ${h} pixel window, so make it fill the whole window ` +
+  `(use 100vw and 100vh) and look good at that size. Give it a rounded, solid or slightly see-through background, because the window ` +
+  `itself is transparent. It can be fully interactive (buttons, inputs, clicks). Save any data with localStorage so it's still there ` +
+  `after a restart. Reply with only the code.\n\nThe widget: [describe your widget here]`;
+
+const code = $("code");
+const preset = $("preset");
+const widthField = $("width");
+const heightField = $("height");
+const frameBox = $("frameBox");
+const stage = $("stage");
+const preview = $("preview");
+
+const store = {
+  get: (k) => {
+    try {
+      return localStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  set: (k, v) => {
+    try {
+      localStorage.setItem(k, v);
+    } catch {
+      /* private browsing */
+    }
+  },
+};
+
+function toast(text) {
+  const t = $("toast");
+  t.textContent = text;
+  t.hidden = false;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => (t.hidden = true), 2600);
+}
+
+async function copy(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.append(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  }
+}
+
+const size = () => ({
+  width: CW.clampSize(widthField.value, 400),
+  height: CW.clampSize(heightField.value, 200),
+});
+
+// ---------- Preview ----------
+
+function layout() {
+  const { width, height } = size();
+  frameBox.style.width = `${width}px`;
+  frameBox.style.height = `${height}px`;
+  const scale = Math.min(1, (stage.clientWidth - 32) / width, (stage.clientHeight - 32) / height);
+  frameBox.style.transform = `scale(${Math.max(0.05, scale)})`;
+  $("previewSize").textContent = `${width} x ${height}${scale < 1 ? ` (shown at ${Math.round(scale * 100)}%)` : ""}`;
+}
+
+let timer = null;
+function render() {
+  preview.srcdoc = CW.toDocument(code.value);
+}
+function changed() {
+  store.set("cw-draft", code.value);
+  clearTimeout(timer);
+  timer = setTimeout(render, 350);
+}
+
+function syncPreset() {
+  const v = `${widthField.value}x${heightField.value}`;
+  preset.value = [...preset.options].some((o) => o.value === v) ? v : "custom";
+}
+
+code.addEventListener("input", changed);
+code.addEventListener("keydown", (e) => {
+  if (e.key !== "Tab" || e.metaKey || e.ctrlKey || e.altKey) return;
+  e.preventDefault();
+  document.execCommand("insertText", false, "  ");
+});
+preset.addEventListener("change", () => {
+  if (preset.value === "custom") return widthField.focus();
+  const [w, h] = preset.value.split("x");
+  widthField.value = w;
+  heightField.value = h;
+  layout();
+});
+for (const f of [widthField, heightField]) {
+  f.addEventListener("input", () => {
+    syncPreset();
+    layout();
+  });
+}
+window.addEventListener("resize", layout);
+$("clear").onclick = () => {
+  code.value = "";
+  changed();
+  code.focus();
+};
+$("prompt").onclick = async () => {
+  const { width, height } = size();
+  await copy(PROMPT(width, height));
+  toast("Prompt copied. Paste it into Claude or ChatGPT.");
+};
+
+// ---------- The right download for this computer ----------
+
+async function detect() {
+  const ua = navigator.userAgent;
+  const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+  if (/Win/i.test(platform) || /Windows/i.test(ua)) return "windows";
+  if (/Linux/i.test(platform) && !/Android/i.test(ua)) return "linux";
+  if (/Mac/i.test(platform) || /Macintosh/i.test(ua)) {
+    // Chrome and Edge can tell Apple silicon from Intel. Safari can't, and almost every Mac sold since 2021 is Apple silicon.
+    try {
+      const v = await navigator.userAgentData.getHighEntropyValues(["architecture"]);
+      if (v.architecture === "x86") return "macIntel";
+    } catch {
+      /* not available */
+    }
+    return "macArm";
+  }
+  return "unknown";
+}
+
+const LABELS = {
+  macArm: "Download for Mac",
+  macIntel: "Download for Mac (Intel)",
+  windows: "Download for Windows",
+  linux: "Download for Linux",
+};
+
+const INSTALL = {
+  mac: `<ol>
+      <li>Open the downloaded file and drag <b>CodeWidget</b> into <b>Applications</b>.</li>
+      <li>Open CodeWidget. Your Mac says <i>"Apple could not verify..."</i>. Click <b>Done</b>.</li>
+      <li>Open <b>System Settings</b>, go to <b>Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b> next to CodeWidget.</li>
+      <li>Enter your password. You only do this once.</li>
+    </ol>`,
+  windows: `<ol>
+      <li>Open the downloaded file.</li>
+      <li>If you see <i>"Windows protected your PC"</i>, click <b>More info</b>, then <b>Run anyway</b>. You only do this once.</li>
+      <li>CodeWidget opens by itself when it's installed.</li>
+    </ol>`,
+  linux: `<ol>
+      <li>Make the file runnable: right-click it, open <b>Properties</b> and allow it to run as a program (or run <kbd>chmod +x CodeWidget-linux-x86_64.AppImage</kbd>).</li>
+      <li>Double-click it to open CodeWidget.</li>
+    </ol>`,
+};
+
+(async () => {
+  const os = await detect();
+  const btn = $("dlBtn");
+  const other = (pairs) => pairs.map(([label, f]) => `<a href="${fileUrl(f)}">${label}</a>`).join(" &middot; ");
+  if (os === "unknown") {
+    $("dlText").textContent = "Pick your computer:";
+    btn.textContent = "See all downloads";
+    btn.href = `${REPO}/releases/latest`;
+    $("dlOther").innerHTML = other([
+      ["Mac (Apple silicon)", FILES.macArm],
+      ["Mac (Intel)", FILES.macIntel],
+      ["Windows", FILES.windows],
+      ["Linux", FILES.linux],
+    ]);
+    $("installSteps").innerHTML = INSTALL.mac;
+    return;
+  }
+  btn.textContent = LABELS[os];
+  btn.href = fileUrl(FILES[os]);
+  for (const a of document.querySelectorAll("[data-download]")) a.textContent = LABELS[os].replace("Download for ", "Get it for ");
+  if (os === "macArm") $("dlOther").innerHTML = `Older Mac with an Intel chip? ${other([["Download the Intel version", FILES.macIntel]])}`;
+  if (os === "macIntel") $("dlOther").innerHTML = `Mac with an M chip? ${other([["Download the Apple silicon version", FILES.macArm]])}`;
+  if (os === "windows" || os === "linux") $("dlOther").innerHTML = `Other computers: ${other([["Mac", FILES.macArm], ["Windows", FILES.windows], ["Linux", FILES.linux]].filter(([, f]) => f !== FILES[os]))}`;
+  $("installSteps").innerHTML = os.startsWith("mac") ? INSTALL.mac : INSTALL[os];
+})();
+
+// ---------- Add to desktop ----------
+
+$("add").onclick = async () => {
+  if (!code.value.trim()) {
+    toast("Paste some code first");
+    return code.focus();
+  }
+  await copy(code.value);
+  $("download").scrollIntoView({ behavior: "smooth" });
+  toast("Code copied. Now get the app.");
+};
+
+$("openApp").onclick = async () => {
+  if (!code.value.trim()) {
+    toast("Paste some code at the top first");
+    return $("maker").scrollIntoView({ behavior: "smooth" });
+  }
+  await copy(code.value);
+  const { width, height } = size();
+  const params = new URLSearchParams({ code: CW.encodeText(code.value), name: $("name").value, w: width, h: height });
+  window.location.href = `codewidget://open?${params}`;
+};
+
+// ---------- Start ----------
+
+const draft = store.get("cw-draft");
+code.value = draft === null ? EXAMPLE : draft;
+layout();
+render();

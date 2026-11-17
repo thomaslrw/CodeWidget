@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CodeWidget: paste code, get a desktop widget</title>
+<meta name="description" content="Paste widget code from any AI, preview it live, and pin it to your Mac, Windows or Linux desktop. Free and open source.">
+<meta property="og:title" content="CodeWidget">
+<meta property="og:description" content="Paste code. Get a desktop widget. Free and open source.">
+<meta property="og:image" content="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <a class="logo" href="#top"><img src="icon.png" alt=""> CodeWidget</a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#faq">FAQ</a>
+    <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>
+    <a class="btn small" href="#download" data-download>Download</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="tag">Free and open source &middot; Mac, Windows and Linux</div>
+  <h1>Paste code.<br>Get a desktop widget.</h1>
+  <p class="lead">Ask any AI for a widget, paste the code below and see it live. Then add it to your desktop in one click.</p>
+  <p class="mobile-note">CodeWidget is for desktop computers. Open this page on your Mac or PC to make a widget.</p>
+</header>
+
+<section class="maker" id="maker">
+  <div class="maker-bar">
+    <div class="bar-left">
+      <input id="name" class="field" placeholder="Widget name" maxlength="60" spellcheck="false">
+      <select id="preset" class="field" title="Size">
+        <option value="200x200">Small 200 x 200</option>
+        <option value="400x200" selected>Medium 400 x 200</option>
+        <option value="400x400">Large 400 x 400</option>
+        <option value="640x240">Wide 640 x 240</option>
+        <option value="300x600">Tall 300 x 600</option>
+        <option value="custom">Custom</option>
+      </select>
+      <input id="width" class="field num" type="number" min="60" max="4000" value="400" aria-label="Width">
+      <span class="x">x</span>
+      <input id="height" class="field num" type="number" min="60" max="4000" value="200" aria-label="Height">
+    </div>
+    <div class="bar-right">
+      <button id="prompt" class="btn ghost">Copy AI prompt</button>
+      <button id="add" class="btn">Add to desktop</button>
+    </div>
+  </div>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-head"><span>Code</span><button id="clear" class="link">Clear</button></div>
+      <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste your widget code here"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-head"><span>Preview</span><span id="previewSize" class="muted">400 x 200</span></div>
+      <div class="stage" id="stage">
+        <div class="frame" id="frameBox">
+          <iframe id="preview" title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="download">
+  <h2>Add it to your desktop</h2>
+  <p class="sub">Widgets live on your desktop through the free CodeWidget app. Three steps, once.</p>
+  <ol class="steps">
+    <li>
+      <div class="num">1</div>
+      <div>
+        <h3>Download CodeWidget</h3>
+        <p id="dlText">We've picked the right version for your computer.</p>
+        <a class="btn" id="dlBtn" href="https://github.com/thomaslrw/CodeWidget/releases/latest">Download</a>
+        <p class="small muted" id="dlOther"></p>
+      </div>
+    </li>
+    <li>
+      <div class="num">2</div>
+      <div>
+        <h3>Install it</h3>
+        <div id="installSteps"></div>
+      </div>
+    </li>
+    <li>
+      <div class="num">3</div>
+      <div>
+        <h3>Open your widget in the app</h3>
+        <p>Your code goes straight into CodeWidget. Press <b>Add widget</b> and it's on your desktop.</p>
+        <button class="btn" id="openApp">Open my widget in CodeWidget</button>
+        <p class="small muted">If nothing happens, open CodeWidget and paste. Your code is copied when you press the button.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section class="section" id="how">
+  <h2>How it works</h2>
+  <div class="cards">
+    <div class="card"><h3>Ask an AI</h3><p>Press <b>Copy AI prompt</b>, paste it into Claude or ChatGPT and say what you want: a habit tracker, a countdown, a to-do list, a clock.</p></div>
+    <div class="card"><h3>Paste and preview</h3><p>Paste the code it gives you. The preview shows it at its real size, working, straight away.</p></div>
+    <div class="card"><h3>Pin it</h3><p>Add it to your desktop. Move it, resize it, keep it on top. It remembers its data after a restart.</p></div>
+  </div>
+  <ul class="features">
+    <li><b>Fully interactive.</b> Buttons, inputs, animations, live data from the web.</li>
+    <li><b>Any size.</b> Pick a preset, type your own, or drag the corner.</li>
+    <li><b>Sandboxed.</b> Widget code can't touch your files or run commands.</li>
+    <li><b>No account.</b> Nothing to sign up for. Your widgets stay on your computer.</li>
+  </ul>
+</section>
+
+<section class="section" id="faq">
+  <h2>FAQ</h2>
+  <details><summary>Is it free?</summary><p>Yes. It's free and open source under the MIT licence. The code is on <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>.</p></details>
+  <details><summary>Which computers does it work on?</summary><p>Mac (Apple silicon and Intel), Windows and Linux. The download button picks the right one for you.</p></details>
+  <details><summary>Does it work on my phone?</summary><p>No. CodeWidget is for desktop computers. Phones only let App Store apps put widgets on the home screen.</p></details>
+  <details><summary>Why does my computer warn me when I open it?</summary><p>CodeWidget isn't signed by Apple or Microsoft yet, so your computer asks you to confirm the first time. The steps above show where to click. After that it opens normally.</p></details>
+  <details><summary>What code works?</summary><p>One HTML file with its CSS and JavaScript inside. Code copied straight from an AI chat works, even with the ``` marks around it.</p></details>
+  <details><summary>Is it safe to paste code from other people?</summary><p>Widget code runs in a sandbox, like a web page. It can't read your files, run commands or use your camera or microphone. Only paste code you're happy to run in a browser.</p></details>
+</section>
+
+<footer class="footer">
+  <span>CodeWidget &middot; MIT licence</span>
+  <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>
+</footer>
+
+<div id="toast" class="toast" hidden></div>
+<script src="code.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

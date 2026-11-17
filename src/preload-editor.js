@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld("cw", {
   setHidden: (id, hidden) => ipcRenderer.invoke("widgets:setHidden", id, hidden),
   setOnTop: (id, onTop) => ipcRenderer.invoke("widgets:setOnTop", id, onTop),
   pendingEdit: () => ipcRenderer.invoke("editor:pendingEdit"),
+  pendingImport: () => ipcRenderer.invoke("editor:pendingImport"),
+  onImport: (fn) => ipcRenderer.on("editor:import", (_e, data) => fn(data)),
   copy: (text) => ipcRenderer.invoke("clipboard:write", text),
   settings: () => ipcRenderer.invoke("settings:get"),
   setOpenAtLogin: (on) => ipcRenderer.invoke("settings:setOpenAtLogin", on),

@@ -241,7 +241,20 @@ $("login").addEventListener("change", async (e) => {
   e.target.checked = await window.cw.setOpenAtLogin(e.target.checked);
 });
 
+// Code sent from the website: fill the editor so they only need to press Add widget.
+function importCode(data) {
+  if (!data || !data.code) return;
+  if (editingId) setMode(null);
+  code.value = data.code;
+  nameField.value = data.name || "";
+  setSize(data.width, data.height);
+  storage.set("draft", code.value);
+  refreshPreview();
+  toast("Your widget is ready. Press Add widget.");
+}
+
 window.cw.onChanged(loadList);
+window.cw.onImport(importCode);
 window.cw.onEdit(startEdit);
 
 // ---------- Start ----------
@@ -256,4 +269,5 @@ window.cw.onEdit(startEdit);
   $("login").checked = !!s.openAtLogin;
   const pending = await window.cw.pendingEdit();
   if (pending) startEdit(pending);
+  importCode(await window.cw.pendingImport());
 })();

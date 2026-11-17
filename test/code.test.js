@@ -34,3 +34,17 @@ test("sizes are kept between 60 and 4000", () => {
   assert.strictEqual(clampSize("abc", 300), 300);
   assert.strictEqual(clampSize(250.6, 300), 251);
 });
+
+test("a link from the website round-trips the code, name and size", () => {
+  const { encodeText, readOpenLink } = require("../src/code");
+  const code = "<b>héllo ✓</b>\n<script>let a = 1 + 2 / 3;</script>";
+  const link = `codewidget://open?code=${encodeText(code)}&name=My%20widget&w=320&h=9`;
+  assert.deepStrictEqual(readOpenLink(link), { code, name: "My widget", width: 320, height: 60 });
+});
+
+test("links that aren't ours, or have no code, are ignored", () => {
+  const { readOpenLink } = require("../src/code");
+  assert.strictEqual(readOpenLink("https://example.com/?code=abc"), null);
+  assert.strictEqual(readOpenLink("codewidget://open"), null);
+  assert.strictEqual(readOpenLink("not a link"), null);
+});

@@ -22,7 +22,7 @@ const {
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-const { toDocument, clampSize } = require("./code");
+const { toDocument, clampSize, readOpenLink } = require("./code");
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -31,7 +31,9 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-if (!app.requestSingleInstanceLock()) {
+// A second launch (e.g. a codewidget:// link on Windows or Linux) hands its link to the running app and quits.
+const launchLink = process.argv.find((a) => typeof a === "string" && a.startsWith("codewidget://")) || null;
+if (!app.requestSingleInstanceLock({ link: launchLink })) {
   app.quit();
   process.exit(0);
 }
@@ -386,6 +388,12 @@ function registerIpc() {
     return id;
   });
 
+  ipcMain.handle("editor:pendingImport", () => {
+    const data = pendingImport;
+    pendingImport = null;
+    return data;
+  });
+
   ipcMain.handle("clipboard:write", (_e, text) => {
     clipboard.writeText(String(text ?? ""));
     return true;
@@ -435,6 +443,30 @@ function registerIpc() {
   });
 }
 
+// ---------- Opening code from the website (codewidget://open?code=...) ----------
+
+let pendingImport = null;
+
+function handleOpenLink(link) {
+  const data = readOpenLink(link);
+  if (!data) return;
+  pendingImport = data;
+  if (!app.isReady()) return; // picked up when the editor first loads
+  if (editor && !editor.isDestroyed()) {
+    editor.webContents.send("editor:import", data);
+    pendingImport = null;
+  }
+  openEditor();
+}
+
+const linkIn = (argv) => argv.find((a) => typeof a === "string" && a.startsWith("codewidget://"));
+
+// Mac sends links here (before or after the app is ready).
+app.on("open-url", (event, link) => {
+  event.preventDefault();
+  handleOpenLink(link);
+});
+
 // ---------- Safety ----------
 
 function lockDown() {
@@ -459,11 +491,26 @@ function lockDown() {
 
 // ---------- Start ----------
 
-app.on("second-instance", () => openEditor());
+// Windows and Linux open links by starting the app again with the link as an argument.
+app.on("second-instance", (_e, argv, _cwd, extra) => {
+  const link = (extra && extra.link) || linkIn(argv);
+  if (link) handleOpenLink(link);
+  else openEditor();
+});
 app.on("activate", () => openEditor());
 // Keep running in the tray when the editor is closed, so the widgets stay on the desktop.
 app.on("window-all-closed", () => {});
 app.on("before-quit", saveNow);
+
+if (process.defaultApp && process.argv.length >= 2) {
+  app.setAsDefaultProtocolClient("codewidget", process.execPath, [path.resolve(process.argv[1])]);
+} else {
+  app.setAsDefaultProtocolClient("codewidget");
+}
+{
+  const link = linkIn(process.argv);
+  if (link) handleOpenLink(link);
+}
 
 app.whenReady().then(() => {
   loadStore();
@@ -473,5 +520,5 @@ app.whenReady().then(() => {
   createTray();
   store.widgets.filter((w) => !w.hidden).forEach(openWidget);
   const atLogin = process.argv.includes("--hidden") || app.getLoginItemSettings().wasOpenedAtLogin;
-  if (!atLogin || store.widgets.length === 0) openEditor();
+  if (!atLogin || store.widgets.length === 0 || pendingImport) openEditor();
 });
