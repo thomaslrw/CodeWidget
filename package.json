@@ -1,0 +1,41 @@
+{
+  "name": "codewidget",
+  "productName": "CodeWidget",
+  "version": "0.1.0",
+  "description": "Paste any widget code, preview it instantly and pin it to your desktop.",
+  "main": "src/main.js",
+  "author": "Thomas Whitehead",
+  "license": "MIT",
+  "homepage": "https://github.com/thomaslrw/codewidget",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "43.8.6",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.thomaslrw.codewidget",
+    "productName": "CodeWidget",
+    "files": ["src/**", "renderer/**", "assets/**", "package.json"],
+    "directories": { "output": "dist", "buildResources": "assets" },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "assets/icon.png",
+      "identity": null,
+      "target": ["dir"]
+    },
+    "dmg": { "artifactName": "CodeWidget-mac-${arch}.dmg" },
+    "win": { "icon": "assets/icon.png", "target": ["nsis"] },
+    "nsis": { "artifactName": "CodeWidget-windows-${arch}-setup.exe", "oneClick": true },
+    "linux": {
+      "icon": "assets/icon.png",
+      "category": "Utility",
+      "target": ["AppImage"],
+      "artifactName": "CodeWidget-linux-${arch}.AppImage"
+    },
+    "publish": null
+  }
+}

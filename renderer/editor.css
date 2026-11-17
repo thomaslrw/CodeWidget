@@ -1,0 +1,102 @@
+:root {
+  --bg: #0b0b0b;
+  --panel: #141414;
+  --line: #2a2a2a;
+  --text: #ededed;
+  --sub: #8c8c8c;
+  --field: #1b1b1b;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, sans-serif;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+}
+button { font: inherit; }
+
+header {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+}
+.brand { font-weight: 700; letter-spacing: .2px; margin-right: 6px; }
+.spacer { flex: 1; }
+.field {
+  background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 7px;
+  padding: 6px 9px; font: inherit; outline: none;
+}
+.field:focus { border-color: #5a5a5a; }
+.name { width: 190px; }
+.size { display: flex; align-items: center; gap: 6px; }
+.num { width: 72px; }
+.x { color: var(--sub); }
+.btn {
+  background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 7px;
+  padding: 7px 12px; cursor: pointer;
+}
+.btn:hover { border-color: #555; }
+.btn.primary { background: #f2f2f2; color: #0b0b0b; border-color: #f2f2f2; font-weight: 600; }
+.btn.primary:hover { background: #fff; }
+.link { background: none; border: 0; color: var(--sub); cursor: pointer; padding: 0; }
+.link:hover { color: var(--text); }
+
+main { display: grid; grid-template-columns: 1fr 1fr; min-height: 0; }
+.pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.pane.code { border-right: 1px solid var(--line); }
+.pane-head {
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--line);
+  font-weight: 600;
+}
+.pane-head .hint { color: var(--sub); font-weight: 400; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+textarea {
+  flex: 1; width: 100%; resize: none; border: 0; outline: none; padding: 14px 16px;
+  background: var(--panel); color: #e6e6e6; tab-size: 2;
+  font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+textarea::placeholder { color: #5d5d5d; }
+
+.stage {
+  flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  background-color: #101010;
+  background-image:
+    linear-gradient(45deg, #181818 25%, transparent 25%), linear-gradient(-45deg, #181818 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #181818 75%), linear-gradient(-45deg, transparent 75%, #181818 75%);
+  background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+.frame { position: relative; outline: 1px dashed #3a3a3a; transform-origin: center center; flex: none; }
+.frame iframe { width: 100%; height: 100%; border: 0; display: block; background: transparent; }
+
+footer { border-top: 1px solid var(--line); padding: 10px 16px 14px; }
+.list-head { display: flex; align-items: center; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
+.login { color: var(--sub); font-weight: 400; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.empty { color: var(--sub); }
+.item {
+  flex: none; display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 9px;
+}
+.item.editing { border-color: #9a9a9a; }
+.item .meta { display: flex; flex-direction: column; min-width: 90px; max-width: 180px; }
+.item .meta b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item .meta small { color: var(--sub); }
+.item .acts { display: flex; gap: 4px; }
+.item .acts button {
+  background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+  padding: 4px 8px; cursor: pointer; font-size: 12px;
+}
+.item .acts button:hover { border-color: #555; }
+.item .acts button.on { background: #e9e9e9; color: #111; border-color: #e9e9e9; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+  background: #f2f2f2; color: #111; padding: 8px 14px; border-radius: 8px; font-weight: 600;
+  box-shadow: 0 6px 24px rgba(0,0,0,.4);
+}
+
+@media (max-width: 900px) {
+  main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  .pane.code { border-right: 0; border-bottom: 1px solid var(--line); }
+}

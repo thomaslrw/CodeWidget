@@ -1,0 +1,112 @@
+# Builds CodeWidget for Mac (Apple silicon and Intel), Windows and Linux on GitHub's free runners.
+# Every pull request is built and tested. Every push to main publishes a release named after the version in
+# package.json (bump the version to publish a new one).
+name: Build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  mac:
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Package for Apple silicon and Intel
+        run: npx electron-builder --mac dir --arm64 --x64
+      # Ad hoc signing, so the app opens after "Open Anyway" instead of being reported as damaged.
+      - name: Sign ad hoc
+        run: |
+          for app in dist/mac-arm64/CodeWidget.app dist/mac/CodeWidget.app; do
+            codesign --force --deep --sign - "$app"
+            codesign --verify --deep --strict "$app"
+          done
+      - name: Make the .dmg files
+        run: |
+          npx electron-builder --mac dmg --arm64 --prepackaged dist/mac-arm64/CodeWidget.app
+          npx electron-builder --mac dmg --x64 --prepackaged dist/mac/CodeWidget.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: dist/*.dmg
+          if-no-files-found: error
+
+  windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx electron-builder --win nsis --x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/*.exe
+          if-no-files-found: error
+
+  linux:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx electron-builder --linux AppImage --x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: dist/*.AppImage
+          if-no-files-found: error
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [mac, windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="v$(node -p "require('./package.json').version")"
+          if gh release view "$V" >/dev/null 2>&1; then
+            echo "Release $V already exists. Bump the version in package.json to publish a new one."
+            exit 0
+          fi
+          gh release create "$V" out/* --title "CodeWidget $V" --notes-file .github/release-notes.md
