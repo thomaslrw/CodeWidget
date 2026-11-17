@@ -147,8 +147,9 @@ h1 .soft { color: #8f8f8f; }
   display: flex; justify-content: space-between; align-items: center; padding: 9px 14px;
   border-bottom: 1px solid var(--line); font-weight: 600; font-size: 14px; background: var(--panel);
 }
+/* On desktop the code box is exactly as tall as the preview next to it (the preview sets the height). */
 textarea {
-  flex: 1; min-height: 300px; resize: none; border: 0; outline: none; padding: 14px; background: #0f0f0f; color: #e6e6e6; tab-size: 2;
+  flex: 1 1 0; min-height: 0; height: 0; resize: none; border: 0; outline: none; padding: 14px; background: #0f0f0f; color: #e6e6e6; tab-size: 2;
   font: 12.5px/1.6 "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 /* The preview box fits the widget: its height is set from the widget's size (app.js). */
@@ -228,7 +229,7 @@ details p { color: #cfcfcf; margin: 10px 0 0; }
   .mobile-note { display: block; }
   .panes { grid-template-columns: 1fr; height: auto; }
   .pane:first-child { border-right: 0; border-bottom: 1px solid var(--line); }
-  textarea { height: 220px; min-height: 0; }
+  textarea { flex: none; height: 220px; }
   .cards, .features { grid-template-columns: 1fr; }
   /* Phones: the two examples side by side, smaller. */
   .examples { grid-template-columns: 1fr 1fr; gap: 10px; }
