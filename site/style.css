@@ -138,7 +138,7 @@ h1 .soft { color: #8f8f8f; }
 .x { color: var(--sub); }
 .panes {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 80px rgba(0,0,0,0.35);
-  display: grid; grid-template-columns: 1fr 1fr; height: 560px;
+  display: grid; grid-template-columns: 1fr 1fr;
   border: 1px solid var(--line); border-radius: 0 0 14px 14px; overflow: hidden;
 }
 .pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
@@ -148,11 +148,12 @@ h1 .soft { color: #8f8f8f; }
   border-bottom: 1px solid var(--line); font-weight: 600; font-size: 14px; background: var(--panel);
 }
 textarea {
-  flex: 1; resize: none; border: 0; outline: none; padding: 14px; background: #0f0f0f; color: #e6e6e6; tab-size: 2;
+  flex: 1; min-height: 300px; resize: none; border: 0; outline: none; padding: 14px; background: #0f0f0f; color: #e6e6e6; tab-size: 2;
   font: 12.5px/1.6 "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
+/* The preview box fits the widget: its height is set from the widget's size (app.js). */
 .stage {
-  flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  flex: none; height: 300px; transition: height .25s ease; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
   background-color: #0e0e0e;
   background-image:
     linear-gradient(45deg, #161616 25%, transparent 25%), linear-gradient(-45deg, #161616 25%, transparent 25%),
@@ -227,8 +228,7 @@ details p { color: #cfcfcf; margin: 10px 0 0; }
   .mobile-note { display: block; }
   .panes { grid-template-columns: 1fr; height: auto; }
   .pane:first-child { border-right: 0; border-bottom: 1px solid var(--line); }
-  textarea { height: 260px; }
-  .stage { height: 320px; }
+  textarea { height: 220px; min-height: 0; }
   .cards, .features { grid-template-columns: 1fr; }
   /* Phones: the two examples side by side, smaller. */
   .examples { grid-template-columns: 1fr 1fr; gap: 10px; }
