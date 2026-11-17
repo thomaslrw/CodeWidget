@@ -226,11 +226,11 @@ const EXAMPLES = [
     editorOnly: true,
   },
   {
-    file: "examples/app-radar.html",
-    name: "App radar",
-    width: 760,
-    height: 300,
-    about: "Watches your app's errors in Sentry. New errors light up on the radar the moment they happen. Shows demo data until you connect your Sentry.",
+    file: "examples/bug-radar.html",
+    name: "App bug radar",
+    width: 360,
+    height: 420,
+    about: "Watches your app's errors in Sentry and lights up when a new bug appears. Shows demo data until you connect your Sentry.",
   },
   {
     file: "examples/ai-news.html",

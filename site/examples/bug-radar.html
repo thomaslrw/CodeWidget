@@ -1,0 +1,340 @@
+<!-- App bug radar: watches your app's errors in Sentry and lights up when a new bug appears.
+     Shows demo data until you connect Sentry with the gear button (your key stays on your computer). -->
+<div class="frame">
+  <div class="w">
+    <div class="head">
+      <div>
+        <div class="t">App bug radar</div>
+        <div class="s" id="sub">Demo data · connect Sentry with ⚙</div>
+      </div>
+      <div class="btns">
+        <button id="refresh" title="Scan now">↻</button>
+        <button id="gear" title="Connect Sentry">⚙</button>
+      </div>
+    </div>
+    <div class="status" id="status"><span class="dot"></span><b>Scanning...</b></div>
+    <div class="stats">
+      <div><b id="errors">-</b><span>errors, 24h</span></div>
+      <div><b id="users">-</b><span>users hit</span></div>
+      <div><b id="fresh">-</b><span>new this hour</span></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart" id="chart"></div>
+      <div class="axis"><span>24h ago</span><span>12h</span><span>now</span></div>
+    </div>
+    <div class="section">Where it's breaking</div>
+    <div class="projects" id="projects"></div>
+    <div class="section">Newest bugs</div>
+    <div class="bugs" id="bugs"></div>
+    <form class="settings" id="settings" hidden>
+      <div class="t">Connect Sentry</div>
+      <p>In Sentry, go to Settings, then Auth Tokens, and create a token with read access. It's saved only on this computer.</p>
+      <label>Organisation slug<input id="org" placeholder="my-company" autocomplete="off" spellcheck="false"></label>
+      <label>Auth token<input id="token" type="password" placeholder="sntryu_..." autocomplete="off"></label>
+      <label>Region
+        <select id="region"><option value="sentry.io">US (sentry.io)</option><option value="de.sentry.io">EU (de.sentry.io)</option></select>
+      </label>
+      <div class="row">
+        <button type="submit" class="primary">Save and scan</button>
+        <button type="button" id="demo">Demo data</button>
+        <button type="button" id="close">Cancel</button>
+      </div>
+      <div class="err" id="err"></div>
+    </form>
+  </div>
+</div>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  /* The radar sweep: a green line with a fading tail travelling round the edge of the card. */
+  .frame { position: relative; height: 100vh; border-radius: 20px; padding: 2px; overflow: hidden; background: #1f2522; }
+  .frame::before {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 300%; height: 300%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    background: conic-gradient(from 0deg, transparent 0deg 250deg, rgba(57, 211, 83, 0.15) 300deg, rgba(57, 211, 83, 0.6) 345deg, #7dff96 360deg);
+    animation: sweep 4s linear infinite;
+  }
+  @keyframes sweep { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  .w {
+    position: relative; height: 100%; border-radius: 18px; background: #0d0f0e; color: #eef2ef; overflow: hidden;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif; display: flex; flex-direction: column; gap: 10px; padding: 16px;
+  }
+  .head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .t { font-weight: 700; font-size: 16px; }
+  .s { color: #8b948f; font-size: 12px; margin-top: 2px; }
+  .btns { display: flex; gap: 6px; }
+  button { height: 30px; min-width: 30px; border-radius: 15px; background: #18201c; color: #dfe7e2; border: 1px solid #27312c; cursor: pointer; font: 13px inherit; padding: 0 9px; }
+  button:hover { border-color: #39d353; color: #39d353; }
+  button.spin { animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status { display: flex; align-items: center; gap: 9px; font-size: 13.5px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #4b524e; flex: none; }
+  .dot.ok { background: #39d353; box-shadow: 0 0 9px rgba(57, 211, 83, .6); }
+  .dot.warn { background: #f5b544; box-shadow: 0 0 9px rgba(245, 181, 68, .6); animation: pulse 1.6s infinite; }
+  .dot.bad { background: #f2555a; box-shadow: 0 0 9px rgba(242, 85, 90, .7); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .stats { display: flex; gap: 20px; }
+  .stats b { display: block; font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stats span { color: #8b948f; font-size: 10.5px; }
+
+  /* Errors per hour over the last 24 hours: red errors stacked on amber warnings. A dot marks an hour where a new bug first appeared. */
+  .chart-wrap { flex: 1; min-height: 70px; display: flex; flex-direction: column; }
+  .chart { flex: 1; display: flex; align-items: flex-end; gap: 3px; padding-top: 12px; border-bottom: 1px solid #1f2622; }
+  .bar { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+  .bar i { display: block; border-radius: 2px 2px 0 0; }
+  .bar .e { background: #f2555a; }
+  .bar .wn { background: #f5b544; opacity: .85; border-radius: 0; }
+  .bar.now .e { box-shadow: 0 0 10px rgba(242, 85, 90, .6); }
+  .bar .spark { position: absolute; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #f2555a; box-shadow: 0 0 8px #f2555a; animation: pulse 1.2s infinite; }
+  .axis { display: flex; justify-content: space-between; color: #6f7873; font-size: 10px; padding-top: 4px; }
+
+  .section { color: #8b948f; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; }
+  .projects { display: flex; flex-direction: column; gap: 6px; }
+  .proj { display: grid; grid-template-columns: 64px 1fr 34px; align-items: center; gap: 8px; font-size: 11.5px; }
+  .proj .name { color: #b8c0bb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .proj .track { height: 8px; border-radius: 4px; background: #171d1a; overflow: hidden; display: flex; }
+  .proj .track i { display: block; height: 100%; }
+  .proj .n { text-align: right; color: #eef2ef; font-variant-numeric: tabular-nums; }
+  .bugs { display: flex; flex-direction: column; gap: 5px; }
+  .bugs a { display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; min-width: 0; }
+  .bugs a:hover .title { text-decoration: underline; }
+  .lvl { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .bugs .title { flex: 1; min-width: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bugs .when { color: #7d8681; font-size: 10.5px; white-space: nowrap; }
+  .new { font-size: 9px; font-weight: 700; color: #0d0f0e; background: #f2555a; border-radius: 4px; padding: 1px 4px; }
+
+  .settings { position: absolute; inset: 0; background: #0d0f0e; padding: 16px; display: flex; flex-direction: column; gap: 9px; z-index: 2; }
+  .settings[hidden] { display: none; }
+  .settings p { margin: 0; color: #8b948f; font-size: 12px; line-height: 1.4; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #b8c0bb; }
+  label input, label select {
+    background: #151a17; color: #eef2ef; border: 1px solid #27312c; border-radius: 8px; padding: 7px 9px; font: 13px inherit; outline: none;
+  }
+  .row { display: flex; gap: 6px; margin-top: 2px; flex-wrap: wrap; }
+  .primary { background: #39d353; color: #07140b; border-color: #39d353; font-weight: 700; }
+  .primary:hover { color: #07140b; background: #4ee067; }
+  .err { color: #f2555a; font-size: 12px; }
+</style>
+<script>
+  const KEY = "app-bug-radar";
+  const SCAN_EVERY = 120;
+  const HOUR = 3600000;
+  let cfg = {};
+  try { cfg = JSON.parse(localStorage.getItem(KEY)) || {}; } catch {}
+  let issues = [];
+  let newIds = new Set();
+  let lastScan = 0;
+
+  const $ = (id) => document.getElementById(id);
+  const isError = (x) => x.level === "error" || x.level === "fatal";
+  const ago = (t) => {
+    const m = Math.round((Date.now() - t) / 60000);
+    return m < 1 ? "just now" : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago`;
+  };
+
+  // Demo data: a few bugs with believable hourly patterns, including a fresh spike in the last hour.
+  function demo() {
+    const now = Date.now();
+    const m = 60000;
+    let seed = 11;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const rows = [
+      ["TypeError: Cannot read properties of undefined (reading 'id')", "web-app", "error", 4 * m, 37, 12, "spike"],
+      ["Stripe webhook timed out after 10000ms", "api", "error", 18 * m, 9, 9, "spike"],
+      ["Failed to fetch /api/generate", "web-app", "error", 52 * m, 64, 21, "spike"],
+      ["Slow DB query: users.findMany took 3.2s", "api", "warning", 15 * 60 * m, 30, 6, "steady"],
+      ["ResizeObserver loop limit exceeded", "web-app", "warning", 22 * 60 * m, 120, 33, "steady"],
+      ["Unhandled promise rejection in onboarding", "web-app", "error", 9 * 60 * m, 18, 4, "steady"],
+      ["Rate limit reached for OpenAI requests", "worker", "warning", 12 * 60 * m, 22, 0, "burst"],
+    ];
+    return rows.map(([title, project, level, age, count, users, shape], i) => {
+      const hours = [];
+      for (let h = 23; h >= 0; h--) {
+        const t = now - h * HOUR;
+        let n = 0;
+        if (t >= now - age - HOUR) {
+          if (shape === "spike") n = h === 0 ? Math.round(count * 0.7) : Math.round(rnd() * count * 0.15);
+          else if (shape === "burst") n = h >= 10 && h <= 12 ? Math.round(count / 3) : 0;
+          else n = Math.round(rnd() * (count / 8));
+        }
+        hours.push([t, n]);
+      }
+      return { id: `demo${i}`, title, project, level, count, users, firstSeen: now - age, lastSeen: now - Math.min(age, 20 * m) / 3, link: "https://sentry.io", hours };
+    });
+  }
+
+  async function sentry(path) {
+    let r;
+    try {
+      r = await fetch(`https://${cfg.region || "sentry.io"}/api/0${path}`, { headers: { Authorization: `Bearer ${cfg.token}` } });
+    } catch {
+      throw new Error("Couldn't reach Sentry. Check the organisation slug, the region and your connection.");
+    }
+    if (r.status === 401 || r.status === 403) throw new Error("Sentry didn't accept that token. Check it has read access.");
+    if (r.status === 404) throw new Error("Couldn't find that organisation. Check the slug and region.");
+    if (!r.ok) throw new Error(`Sentry said ${r.status}. Try again in a minute.`);
+    return r.json();
+  }
+
+  async function scan() {
+    $("refresh").classList.add("spin");
+    const before = new Set(issues.map((x) => x.id));
+    try {
+      if (!cfg.token || !cfg.org) {
+        issues = demo();
+        $("sub").textContent = "Demo data · connect Sentry with ⚙";
+      } else {
+        // Each issue comes with its own hourly counts for the last 24 hours (stats["24h"]).
+        const raw = await sentry(`/organizations/${encodeURIComponent(cfg.org)}/issues/?query=is%3Aunresolved&statsPeriod=24h&groupStatsPeriod=24h&sort=date&limit=50`);
+        issues = raw.map((x) => ({
+          id: x.id, title: x.title, project: x.project?.slug || "", level: x.level,
+          count: Number(x.count) || 0, users: Number(x.userCount) || 0,
+          firstSeen: Date.parse(x.firstSeen), lastSeen: Date.parse(x.lastSeen), link: x.permalink,
+          hours: ((x.stats && x.stats["24h"]) || []).map(([ts, n]) => [ts * 1000, n]),
+        }));
+        $("sub").textContent = `${cfg.org} · scanned ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      }
+      newIds = new Set(issues.filter((x) => (lastScan && !before.has(x.id)) || Date.now() - x.firstSeen < HOUR).map((x) => x.id));
+      lastScan = Date.now();
+      show();
+    } catch (e) {
+      $("status").innerHTML = '<span class="dot bad"></span><b></b>';
+      $("status").querySelector("b").textContent = e.message || "Couldn't reach Sentry.";
+    }
+    $("refresh").classList.remove("spin");
+  }
+
+  function show() {
+    const now = Date.now();
+    // Hourly totals, oldest first: errors and warnings separately.
+    const buckets = Array.from({ length: 24 }, () => ({ e: 0, w: 0, fresh: false }));
+    for (const x of issues) {
+      for (const [t, n] of x.hours || []) {
+        const i = 23 - Math.floor((now - t) / HOUR);
+        if (i >= 0 && i < 24) buckets[i][isError(x) ? "e" : "w"] += n;
+      }
+      const fi = 23 - Math.floor((now - x.firstSeen) / HOUR);
+      if (fi >= 0 && fi < 24 && now - x.firstSeen < 24 * HOUR) buckets[fi].fresh = true;
+    }
+    const total24 = buckets.reduce((n, b) => n + b.e + b.w, 0);
+    const max = Math.max(1, ...buckets.map((b) => b.e + b.w));
+    const chart = $("chart");
+    chart.textContent = "";
+    buckets.forEach((b, i) => {
+      const bar = document.createElement("div");
+      bar.className = `bar${i === 23 ? " now" : ""}`;
+      bar.title = `${23 - i === 0 ? "This hour" : `${23 - i}h ago`}: ${b.e} errors, ${b.w} warnings`;
+      const sum = b.e + b.w;
+      const e = document.createElement("i");
+      e.className = "e";
+      e.style.height = `${(b.e / max) * 100}%`;
+      const w = document.createElement("i");
+      w.className = "wn";
+      w.style.height = `${(b.w / max) * 100}%`;
+      if (!b.e) w.style.borderRadius = "2px 2px 0 0";
+      bar.append(e, w);
+      if (b.fresh) {
+        const s = document.createElement("span");
+        s.className = "spark";
+        s.style.bottom = `calc(${(sum / max) * 100}% + 4px)`;
+        bar.append(s);
+      }
+      chart.append(bar);
+    });
+
+    $("errors").textContent = (total24 || issues.reduce((n, x) => n + x.count, 0)).toLocaleString();
+    $("users").textContent = issues.reduce((n, x) => n + x.users, 0).toLocaleString();
+    $("fresh").textContent = newIds.size;
+    const bad = issues.some((x) => newIds.has(x.id) && isError(x));
+    const st = $("status");
+    st.innerHTML = `<span class="dot ${bad ? "bad" : newIds.size ? "warn" : "ok"}"></span><b></b>`;
+    st.querySelector("b").textContent = !issues.length
+      ? "All clear. No bugs on the radar."
+      : newIds.size
+        ? `${newIds.size} new ${newIds.size === 1 ? "bug" : "bugs"} in the last hour`
+        : `${issues.length} open, nothing new`;
+
+    // Events per project, errors and warnings, biggest first.
+    const byProject = {};
+    for (const x of issues) {
+      const p = (byProject[x.project] ||= { e: 0, w: 0 });
+      p[isError(x) ? "e" : "w"] += x.count;
+    }
+    const projects = Object.entries(byProject).sort((a, b) => b[1].e + b[1].w - (a[1].e + a[1].w)).slice(0, 3);
+    const pmax = Math.max(1, ...projects.map(([, p]) => p.e + p.w));
+    const list = $("projects");
+    list.textContent = "";
+    if (!projects.length) list.innerHTML = '<div class="proj"><span class="name">Nothing</span><div class="track"></div><span class="n">0</span></div>';
+    for (const [name, p] of projects) {
+      const row = document.createElement("div");
+      row.className = "proj";
+      row.innerHTML = '<span class="name"></span><div class="track"><i class="pe"></i><i class="pw"></i></div><span class="n"></span>';
+      row.querySelector(".name").textContent = name || "(no project)";
+      row.querySelector(".pe").style.cssText = `width:${(p.e / pmax) * 100}%;background:#f2555a`;
+      row.querySelector(".pw").style.cssText = `width:${(p.w / pmax) * 100}%;background:#f5b544`;
+      row.querySelector(".n").textContent = p.e + p.w;
+      list.append(row);
+    }
+
+    const bugs = $("bugs");
+    bugs.textContent = "";
+    if (!issues.length) bugs.innerHTML = '<div class="when">Nothing new. Nice.</div>';
+    [...issues].sort((a, b) => b.firstSeen - a.firstSeen).slice(0, 2).forEach((x) => {
+      const a = document.createElement("a");
+      a.href = x.link;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.innerHTML = '<span class="lvl"></span><span class="title"></span><span class="when"></span>';
+      a.querySelector(".lvl").style.background = isError(x) ? "#f2555a" : "#f5b544";
+      a.querySelector(".title").textContent = x.title;
+      a.querySelector(".when").textContent = ago(x.firstSeen);
+      if (newIds.has(x.id)) {
+        const n = document.createElement("span");
+        n.className = "new";
+        n.textContent = "NEW";
+        a.append(n);
+      }
+      bugs.append(a);
+    });
+  }
+
+  const form = $("settings");
+  $("gear").onclick = () => {
+    $("org").value = cfg.org || "";
+    $("token").value = cfg.token || "";
+    $("region").value = cfg.region || "sentry.io";
+    $("err").textContent = "";
+    form.hidden = false;
+  };
+  $("close").onclick = () => (form.hidden = true);
+  $("demo").onclick = () => {
+    cfg = {};
+    try { localStorage.removeItem(KEY); } catch {}
+    form.hidden = true;
+    lastScan = 0;
+    issues = [];
+    scan();
+  };
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const next = { org: $("org").value.trim(), token: $("token").value.trim(), region: $("region").value };
+    if (!next.org || !next.token) return ($("err").textContent = "Fill in both the organisation and the token.");
+    const old = cfg;
+    cfg = next;
+    try {
+      await sentry(`/organizations/${encodeURIComponent(cfg.org)}/issues/?limit=1&statsPeriod=24h`);
+    } catch (err) {
+      cfg = old;
+      return ($("err").textContent = err.message || "Couldn't reach Sentry.");
+    }
+    try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch {}
+    form.hidden = true;
+    lastScan = 0;
+    issues = [];
+    scan();
+  };
+
+  $("refresh").onclick = scan;
+  scan();
+  setInterval(scan, SCAN_EVERY * 1000);
+</script>
