@@ -36,15 +36,13 @@
       <input id="name" class="field" placeholder="Widget name" maxlength="60" spellcheck="false">
       <select id="preset" class="field" title="Size">
         <option value="200x200">Small 200 x 200</option>
-        <option value="400x200" selected>Medium 400 x 200</option>
+        <option value="400x200">Medium 400 x 200</option>
         <option value="400x400">Large 400 x 400</option>
-        <option value="640x240">Wide 640 x 240</option>
+        <option value="360x420">Portrait 360 x 420</option>
         <option value="300x600">Tall 300 x 600</option>
-        <option value="custom">Custom</option>
+        <option value="640x240">Wide 640 x 240</option>
+        <option value="760x300" selected>Extra wide 760 x 300</option>
       </select>
-      <input id="width" class="field num" type="number" min="60" max="4000" value="400" aria-label="Width">
-      <span class="x">x</span>
-      <input id="height" class="field num" type="number" min="60" max="4000" value="200" aria-label="Height">
     </div>
     <div class="bar-right">
       <button id="prompt" class="btn ghost">Copy AI prompt</button>
@@ -114,7 +112,7 @@
   </div>
   <ul class="features">
     <li><b>Fully interactive.</b> Buttons, inputs, animations, live data from the web.</li>
-    <li><b>Any size.</b> Pick a preset, type your own, or drag the corner.</li>
+    <li><b>Any size.</b> Pick a size here, then drag the corner on your desktop to fine-tune it.</li>
     <li><b>Sandboxed.</b> Widget code can't touch your files or run commands.</li>
     <li><b>No account.</b> Nothing to sign up for. Your widgets stay on your computer.</li>
   </ul>

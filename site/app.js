@@ -10,31 +10,7 @@ const FILES = {
 };
 const fileUrl = (f) => `${REPO}/releases/latest/download/${f}`;
 
-const EXAMPLE = `<!-- An example widget: a clock. Replace this with your own code. -->
-<div class="clock">
-  <div id="time">00:00</div>
-  <div id="date"></div>
-</div>
-<style>
-  .clock {
-    height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(12, 12, 12, 0.85); color: #fff; border-radius: 22px;
-    font-family: -apple-system, "Segoe UI", sans-serif;
-  }
-  #time { font-size: 64px; font-weight: 700; letter-spacing: -2px; }
-  #date { font-size: 15px; color: #9a9a9a; margin-top: 4px; }
-</style>
-<script>
-  function tick() {
-    const now = new Date();
-    document.getElementById("time").textContent =
-      now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    document.getElementById("date").textContent =
-      now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
-  }
-  tick();
-  setInterval(tick, 1000);
-</script>`;
+// The page opens on the first example (the AI shipping streak), so the preview shows something real straight away.
 
 const PROMPT = (w, h) =>
   `Make me a desktop widget as ONE self-contained HTML file: HTML, CSS and JavaScript all inline, no build step. ` +
@@ -45,12 +21,11 @@ const PROMPT = (w, h) =>
 
 const code = $("code");
 const preset = $("preset");
-const widthField = $("width");
-const heightField = $("height");
 const frameBox = $("frameBox");
 const stage = $("stage");
 const preview = $("preview");
 
+const DRAFT = "cw-draft-v2";
 const store = {
   get: (k) => {
     try {
@@ -91,10 +66,25 @@ async function copy(text) {
   }
 }
 
-const size = () => ({
-  width: CW.clampSize(widthField.value, 400),
-  height: CW.clampSize(heightField.value, 200),
-});
+// Sizes come only from the presets.
+const size = () => {
+  const [w, h] = preset.value.split("x");
+  return { width: CW.clampSize(w, 400), height: CW.clampSize(h, 200) };
+};
+/** Picks the preset for a size (or the closest one when an old size isn't a preset). */
+function setPreset(width, height) {
+  let best = preset.options[0];
+  let gap = Infinity;
+  for (const o of preset.options) {
+    const [w, h] = o.value.split("x").map(Number);
+    const d = Math.abs(w - width) + Math.abs(h - height);
+    if (d < gap) {
+      gap = d;
+      best = o;
+    }
+  }
+  preset.value = best.value;
+}
 
 // ---------- Preview ----------
 
@@ -112,15 +102,11 @@ function render() {
   preview.srcdoc = CW.toDocument(code.value);
 }
 function changed() {
-  store.set("cw-draft", code.value);
+  store.set(DRAFT, code.value);
   clearTimeout(timer);
   timer = setTimeout(render, 350);
 }
 
-function syncPreset() {
-  const v = `${widthField.value}x${heightField.value}`;
-  preset.value = [...preset.options].some((o) => o.value === v) ? v : "custom";
-}
 
 code.addEventListener("input", changed);
 code.addEventListener("keydown", (e) => {
@@ -129,18 +115,9 @@ code.addEventListener("keydown", (e) => {
   document.execCommand("insertText", false, "  ");
 });
 preset.addEventListener("change", () => {
-  if (preset.value === "custom") return widthField.focus();
-  const [w, h] = preset.value.split("x");
-  widthField.value = w;
-  heightField.value = h;
+  store.set(DRAFT_SIZE, preset.value);
   layout();
 });
-for (const f of [widthField, heightField]) {
-  f.addEventListener("input", () => {
-    syncPreset();
-    layout();
-  });
-}
 window.addEventListener("resize", layout);
 $("clear").onclick = () => {
   code.value = "";
@@ -260,7 +237,7 @@ const EXAMPLES = [
   {
     file: "examples/prompt-library.html",
     name: "Prompt library",
-    width: 340,
+    width: 360,
     height: 420,
     about: "Your best prompts, one click to copy. Comes with five good ones. Add your own with +.",
   },
@@ -309,9 +286,8 @@ async function loadExamples() {
     card.querySelector("button").onclick = () => {
       code.value = source;
       $("name").value = ex.name;
-      widthField.value = ex.width;
-      heightField.value = ex.height;
-      syncPreset();
+      setPreset(ex.width, ex.height);
+      store.set(DRAFT_SIZE, preset.value);
       layout();
       changed();
       render();
@@ -326,8 +302,24 @@ window.addEventListener("resize", fitExamples);
 
 // ---------- Start ----------
 
-const draft = store.get("cw-draft");
-code.value = draft === null ? EXAMPLE : draft;
-layout();
-render();
-loadExamples();
+// What someone pasted before is kept; first-time visitors get the AI shipping streak.
+const DRAFT_SIZE = "cw-draft-size";
+(async () => {
+  const draft = store.get(DRAFT);
+  if (draft !== null && draft.trim()) {
+    code.value = draft;
+    const [w, h] = (store.get(DRAFT_SIZE) || "760x300").split("x").map(Number);
+    setPreset(w, h);
+  } else {
+    try {
+      code.value = await (await fetch(EXAMPLES[0].file)).text();
+      $("name").value = EXAMPLES[0].name;
+    } catch {
+      code.value = "";
+    }
+    setPreset(EXAMPLES[0].width, EXAMPLES[0].height);
+  }
+  layout();
+  render();
+  loadExamples();
+})();
