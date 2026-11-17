@@ -46,12 +46,12 @@
 <style>
   * { box-sizing: border-box; }
   html, body { height: 100%; }
-  /* The radar sweep: a green line with a fading tail travelling round the edge of the card. */
-  .frame { position: relative; height: 100vh; border-radius: 20px; padding: 2px; overflow: hidden; background: #1f2522; }
+  /* The radar sweep: a red line with a fading tail travelling round the edge of the card. */
+  .frame { position: relative; height: 100vh; border-radius: 20px; padding: 2px; overflow: hidden; background: #262022; }
   .frame::before {
     content: ""; position: absolute; left: 50%; top: 50%; width: 300%; height: 300%;
     transform: translate(-50%, -50%) rotate(0deg);
-    background: conic-gradient(from 0deg, transparent 0deg 250deg, rgba(57, 211, 83, 0.15) 300deg, rgba(57, 211, 83, 0.6) 345deg, #7dff96 360deg);
+    background: conic-gradient(from 0deg, transparent 0deg 250deg, rgba(242, 85, 90, 0.15) 300deg, rgba(242, 85, 90, 0.65) 345deg, #ff8a8d 360deg);
     animation: sweep 4s linear infinite;
   }
   @keyframes sweep { to { transform: translate(-50%, -50%) rotate(360deg); } }
