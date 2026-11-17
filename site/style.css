@@ -13,15 +13,6 @@ body {
   font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-/* A subtle grid fixed behind the page, so content scrolls over it (same 44px grid as UserClimb, a little stronger). */
-body::before {
-  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.065) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.065) 1px, transparent 1px);
-  background-size: 44px 44px;
-  background-position: center top;
-}
 a { color: inherit; }
 button { font: inherit; }
 .muted { color: var(--sub); }
@@ -60,6 +51,9 @@ h1 { font-size: clamp(38px, 6vw, 64px); line-height: 1.04; letter-spacing: -0.03
   padding: 12px; border: 1px solid var(--line); border-bottom: 0; border-radius: 14px 14px 0 0; background: var(--panel);
 }
 .bar-left, .bar-right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+/* Every control in the bar is the same height. */
+.maker-bar .field, .maker-bar .btn { height: 40px; padding-top: 0; padding-bottom: 0; line-height: 38px; font-size: 14px; }
+.maker-bar select.field { padding-right: 8px; }
 .field {
   background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
   padding: 8px 10px; font: inherit; font-size: 14px; outline: none;
@@ -93,7 +87,7 @@ textarea {
 .frame { flex: none; outline: 1px dashed #3a3a3a; transform-origin: center center; }
 .frame iframe { width: 100%; height: 100%; border: 0; display: block; background: transparent; }
 
-.section { max-width: 920px; margin: 0 auto; padding: 64px 24px; border-top: 1px solid var(--line); }
+.section { max-width: 920px; margin: 0 auto; padding: 64px 24px; }
 h2 { font-size: 32px; letter-spacing: -0.02em; margin: 0 0 8px; }
 .sub { color: var(--sub); margin: 0 0 28px; }
 h3 { margin: 0 0 6px; font-size: 17px; }
@@ -137,7 +131,7 @@ details { border-bottom: 1px solid var(--line); padding: 14px 0; }
 summary { cursor: pointer; font-weight: 600; }
 details p { color: #cfcfcf; margin: 10px 0 0; }
 
-.footer { display: flex; justify-content: space-between; max-width: 920px; margin: 0 auto; padding: 28px 24px 48px; color: var(--sub); font-size: 14px; border-top: 1px solid var(--line); }
+.footer { display: flex; justify-content: space-between; max-width: 920px; margin: 0 auto; padding: 28px 24px 48px; color: var(--sub); font-size: 14px; }
 
 .toast {
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10;
@@ -155,4 +149,10 @@ details p { color: #cfcfcf; margin: 10px 0 0; }
   .cards, .features, .examples { grid-template-columns: 1fr; }
   .example-stage, .example:first-child .example-stage { height: 300px; }
   #add { display: none; }
+  /* Phones: name and size side by side, Copy AI prompt across the full width below. */
+  .maker-bar { display: grid; grid-template-columns: 1fr 1.3fr; }
+  .bar-left { display: contents; }
+  .bar-right { grid-column: 1 / -1; }
+  .bar-right .btn { flex: 1; }
+  #name, #preset { width: 100%; min-width: 0; }
 }

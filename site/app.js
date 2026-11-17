@@ -27,23 +27,13 @@ const frameBox = $("frameBox");
 const stage = $("stage");
 const preview = $("preview");
 
-const DRAFT = "cw-draft-v2";
-const store = {
-  get: (k) => {
-    try {
-      return localStorage.getItem(k);
-    } catch {
-      return null;
-    }
-  },
-  set: (k, v) => {
-    try {
-      localStorage.setItem(k, v);
-    } catch {
-      /* private browsing */
-    }
-  },
-};
+// The website always starts fresh: a refresh brings back the original examples and editor, even after
+// someone has clicked around in them (the widgets save to this page's storage while they play).
+try {
+  localStorage.clear();
+} catch {
+  /* storage blocked */
+}
 
 function toast(text) {
   const t = $("toast");
@@ -104,7 +94,6 @@ function render() {
   preview.srcdoc = CW.toDocument(code.value);
 }
 function changed() {
-  store.set(DRAFT, code.value);
   clearTimeout(timer);
   timer = setTimeout(render, 350);
 }
@@ -117,7 +106,6 @@ code.addEventListener("keydown", (e) => {
   document.execCommand("insertText", false, "  ");
 });
 preset.addEventListener("change", () => {
-  store.set(DRAFT_SIZE, preset.value);
   layout();
 });
 window.addEventListener("resize", layout);
@@ -237,11 +225,11 @@ const EXAMPLES = [
     about: "A year of days you built something with AI, with streaks and a monthly trend. Click any day to log it.",
   },
   {
-    file: "examples/prompt-library.html",
-    name: "Prompt library",
+    file: "examples/ai-status.html",
+    name: "AI status",
     width: 360,
     height: 420,
-    about: "Your best prompts, one click to copy. Comes with five good ones. Add your own with +.",
+    about: "Is Claude, ChatGPT, GitHub or Vercel having problems right now? Live from their status pages, checked every 2 minutes.",
   },
   {
     file: "examples/ai-news.html",
@@ -289,7 +277,6 @@ async function loadExamples() {
       code.value = source;
       $("name").value = ex.name;
       setPreset(ex.width, ex.height);
-      store.set(DRAFT_SIZE, preset.value);
       layout();
       changed();
       render();
@@ -305,22 +292,15 @@ window.addEventListener("resize", fitExamples);
 // ---------- Start ----------
 
 // What someone pasted before is kept; first-time visitors get the AI shipping streak.
-const DRAFT_SIZE = "cw-draft-size";
+// Every visit opens on the AI shipping streak.
 (async () => {
-  const draft = store.get(DRAFT);
-  if (draft !== null && draft.trim()) {
-    code.value = draft;
-    const [w, h] = (store.get(DRAFT_SIZE) || "760x300").split("x").map(Number);
-    setPreset(w, h);
-  } else {
-    try {
-      code.value = await (await fetch(`${EXAMPLES[0].file}?v=${V}`)).text();
-      $("name").value = EXAMPLES[0].name;
-    } catch {
-      code.value = "";
-    }
-    setPreset(EXAMPLES[0].width, EXAMPLES[0].height);
+  try {
+    code.value = await (await fetch(`${EXAMPLES[0].file}?v=${V}`)).text();
+    $("name").value = EXAMPLES[0].name;
+  } catch {
+    code.value = "";
   }
+  setPreset(EXAMPLES[0].width, EXAMPLES[0].height);
   layout();
   render();
   loadExamples();

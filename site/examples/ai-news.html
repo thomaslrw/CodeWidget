@@ -11,19 +11,21 @@
   .w {
     height: 100vh; padding: 16px; border-radius: 20px; background: #0f1012; color: #f0f1f3;
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif; display: flex; flex-direction: column; gap: 10px;
-    border: 1px solid #212328; overflow: hidden;
+    border: 1px solid #3a2a1c; overflow: hidden;
   }
   .head { display: flex; justify-content: space-between; align-items: center; }
-  .t { font-weight: 700; font-size: 16px; }
+  .t { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .t::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #ff8a3d; box-shadow: 0 0 10px #ff7a1a; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
   .s { color: #8a8d95; font-size: 12px; margin-top: 2px; }
   button { width: 30px; height: 30px; border-radius: 50%; background: #1c1d21; color: #e6e7ea; border: 1px solid #2b2d33; cursor: pointer; font-size: 15px; }
-  button:hover { border-color: #55575f; }
+  button:hover { border-color: #ff8a3d; color: #ff8a3d; }
   button.spin { animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
   a { display: flex; gap: 10px; padding: 9px 4px; border-bottom: 1px solid #1d1f23; color: inherit; text-decoration: none; }
-  a:hover .title { text-decoration: underline; }
-  .rank { color: #5e616a; font-size: 12px; width: 16px; flex: none; padding-top: 1px; }
+  a:hover .title { color: #ffb27a; }
+  .rank { color: #ff8a3d; font-weight: 700; font-size: 12px; width: 16px; flex: none; padding-top: 1px; }
   .title { font-size: 13px; line-height: 1.35; }
   .meta { color: #8a8d95; font-size: 11px; margin-top: 3px; }
   .msg { color: #8a8d95; font-size: 13px; padding: 10px 4px; }
