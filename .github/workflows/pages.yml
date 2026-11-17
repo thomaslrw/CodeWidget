@@ -30,6 +30,10 @@ jobs:
           cp -r site/. _site/
           cp src/code.js _site/code.js
           cp assets/icon.png _site/icon.png
+          # New file names for every publish, so phones never mix an old script with a new page.
+          V="${GITHUB_SHA::8}"
+          sed -i "s#\(href=\"style.css\)\"#\1?v=$V\"#; s#\(src=\"code.js\)\"#\1?v=$V\"#; s#\(src=\"app.js\)\"#\1?v=$V\"#" _site/index.html
+          sed -i "s#const V = \"dev\";#const V = \"$V\";#" _site/app.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

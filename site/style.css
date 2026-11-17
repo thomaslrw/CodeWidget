@@ -13,6 +13,15 @@ body {
   font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+/* A subtle grid fixed behind the page, so content scrolls over it (same 44px grid as UserClimb, a little stronger). */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.065) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.065) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center top;
+}
 a { color: inherit; }
 button { font: inherit; }
 .muted { color: var(--sub); }
