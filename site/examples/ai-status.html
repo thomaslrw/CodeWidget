@@ -1,0 +1,103 @@
+<!-- AI status board: is Claude, ChatGPT, GitHub or Vercel having problems right now? Live from their official status pages, checked every 2 minutes. Click a row to open that status page. -->
+<div class="w">
+  <div class="head">
+    <div><div class="t">AI status</div><div class="s" id="sub">Checking...</div></div>
+    <button id="refresh" title="Check now">↻</button>
+  </div>
+  <div class="overall" id="overall"><span class="dot"></span><b>Checking services</b></div>
+  <div class="list" id="list"></div>
+</div>
+<style>
+  * { box-sizing: border-box; }
+  .w {
+    height: 100vh; padding: 16px; border-radius: 20px; background: #0e1013; color: #eef1f5;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif; display: flex; flex-direction: column; gap: 12px;
+    border: 1px solid #1d2a3a; overflow: hidden;
+    background-image: radial-gradient(120% 60% at 100% 0%, rgba(56, 152, 255, 0.16), transparent 60%);
+  }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  .t { font-weight: 700; font-size: 16px; }
+  .s { color: #8a93a0; font-size: 12px; margin-top: 2px; }
+  button { width: 30px; height: 30px; border-radius: 50%; background: #18202b; color: #dfe6ef; border: 1px solid #263243; cursor: pointer; font-size: 15px; }
+  button:hover { border-color: #3898ff; color: #6fb4ff; }
+  button.spin { animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .overall {
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px;
+    background: #141b24; border: 1px solid #223044; font-size: 14px;
+  }
+  .list { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+  .row {
+    display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; background: #131820;
+    border: 1px solid #1e2632; cursor: pointer; text-decoration: none; color: inherit;
+  }
+  .row:hover { border-color: #33465f; }
+  .logo { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; }
+  .name { font-weight: 600; font-size: 14px; }
+  .desc { color: #8a93a0; font-size: 12px; margin-top: 1px; }
+  .info { flex: 1; min-width: 0; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: #59636f; }
+  .ok { background: #34d399; box-shadow: 0 0 10px rgba(52, 211, 153, .7); }
+  .minor { background: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, .7); animation: pulse 1.6s ease-in-out infinite; }
+  .major { background: #f87171; box-shadow: 0 0 10px rgba(248, 113, 113, .8); animation: pulse 1s ease-in-out infinite; }
+  .unknown { background: #59636f; }
+  @keyframes pulse { 50% { opacity: .4; } }
+</style>
+<script>
+  // Each service's official status page (they all run on the same status system and allow widgets to read them).
+  const SERVICES = [
+    { name: "Claude", url: "https://status.claude.com", logo: "C", bg: "#d97757", fg: "#fff" },
+    { name: "ChatGPT", url: "https://status.openai.com", logo: "G", bg: "#10a37f", fg: "#fff" },
+    { name: "GitHub", url: "https://www.githubstatus.com", logo: "GH", bg: "#f0f3f6", fg: "#111" },
+    { name: "Vercel", url: "https://www.vercel-status.com", logo: "▲", bg: "#000", fg: "#fff" },
+  ];
+  const LEVEL = { none: "ok", minor: "minor", major: "major", critical: "major", maintenance: "minor" };
+  const list = document.getElementById("list");
+  const btn = document.getElementById("refresh");
+
+  const rows = SERVICES.map((s) => {
+    const a = document.createElement("a");
+    a.className = "row";
+    a.href = s.url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.innerHTML = `<div class="logo"></div><div class="info"><div class="name"></div><div class="desc">Checking...</div></div><span class="dot"></span>`;
+    const logo = a.querySelector(".logo");
+    logo.textContent = s.logo;
+    logo.style.background = s.bg;
+    logo.style.color = s.fg;
+    if (s.bg === "#000") logo.style.border = "1px solid #333";
+    a.querySelector(".name").textContent = s.name;
+    list.append(a);
+    return a;
+  });
+
+  async function check() {
+    btn.classList.add("spin");
+    const results = await Promise.all(SERVICES.map(async (s) => {
+      try {
+        const r = await fetch(`${s.url}/api/v2/status.json`, { cache: "no-store" });
+        const j = await r.json();
+        return { level: LEVEL[j.status.indicator] || "unknown", text: j.status.description };
+      } catch {
+        return { level: "unknown", text: "Couldn't check" };
+      }
+    }));
+    results.forEach((r, i) => {
+      rows[i].querySelector(".desc").textContent = r.text;
+      rows[i].querySelector(".dot").className = `dot ${r.level}`;
+    });
+    const issues = results.filter((r) => r.level === "minor" || r.level === "major").length;
+    const down = results.some((r) => r.level === "major");
+    const overall = document.getElementById("overall");
+    overall.innerHTML = `<span class="dot ${down ? "major" : issues ? "minor" : "ok"}"></span><b></b>`;
+    overall.querySelector("b").textContent = issues
+      ? `${issues} of ${SERVICES.length} having issues`
+      : results.every((r) => r.level === "ok") ? "Everything's running" : "Some couldn't be checked";
+    document.getElementById("sub").textContent = `Live · checked ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    btn.classList.remove("spin");
+  }
+  btn.onclick = check;
+  check();
+  setInterval(check, 2 * 60 * 1000);
+</script>

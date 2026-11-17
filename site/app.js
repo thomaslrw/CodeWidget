@@ -225,11 +225,11 @@ const EXAMPLES = [
     about: "A year of days you built something with AI, with streaks and a monthly trend. Click any day to log it.",
   },
   {
-    file: "examples/prompt-library.html",
-    name: "Prompt library",
+    file: "examples/ai-status.html",
+    name: "AI status",
     width: 360,
     height: 420,
-    about: "Your best prompts, one click to copy. Comes with five good ones. Add your own with +.",
+    about: "Is Claude, ChatGPT, GitHub or Vercel having problems right now? Live from their status pages, checked every 2 minutes.",
   },
   {
     file: "examples/ai-news.html",

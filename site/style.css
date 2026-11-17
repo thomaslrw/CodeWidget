@@ -51,6 +51,9 @@ h1 { font-size: clamp(38px, 6vw, 64px); line-height: 1.04; letter-spacing: -0.03
   padding: 12px; border: 1px solid var(--line); border-bottom: 0; border-radius: 14px 14px 0 0; background: var(--panel);
 }
 .bar-left, .bar-right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+/* Every control in the bar is the same height. */
+.maker-bar .field, .maker-bar .btn { height: 40px; padding-top: 0; padding-bottom: 0; line-height: 38px; font-size: 14px; }
+.maker-bar select.field { padding-right: 8px; }
 .field {
   background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
   padding: 8px 10px; font: inherit; font-size: 14px; outline: none;
@@ -146,4 +149,10 @@ details p { color: #cfcfcf; margin: 10px 0 0; }
   .cards, .features, .examples { grid-template-columns: 1fr; }
   .example-stage, .example:first-child .example-stage { height: 300px; }
   #add { display: none; }
+  /* Phones: name and size side by side, Copy AI prompt across the full width below. */
+  .maker-bar { display: grid; grid-template-columns: 1fr 1.3fr; }
+  .bar-left { display: contents; }
+  .bar-right { grid-column: 1 / -1; }
+  .bar-right .btn { flex: 1; }
+  #name, #preset { width: 100%; min-width: 0; }
 }
