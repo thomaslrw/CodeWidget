@@ -15,6 +15,7 @@
 <nav class="nav">
   <a class="logo" href="#top"><img src="icon.png" alt=""> CodeWidget</a>
   <div class="nav-links">
+    <a href="#examples">Examples</a>
     <a href="#how">How it works</a>
     <a href="#faq">FAQ</a>
     <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>
@@ -59,11 +60,17 @@
       <div class="pane-head"><span>Preview</span><span id="previewSize" class="muted">400 x 200</span></div>
       <div class="stage" id="stage">
         <div class="frame" id="frameBox">
-          <iframe id="preview" title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+          <iframe id="preview" title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox" allow="clipboard-write"></iframe>
         </div>
       </div>
     </div>
   </div>
+</section>
+
+<section class="section wide" id="examples">
+  <h2>Examples</h2>
+  <p class="sub">Real widgets, running live. Press <b>Use this</b> to load one into the editor, change anything, then add it to your desktop.</p>
+  <div class="examples" id="exampleList"></div>
 </section>
 
 <section class="section" id="download">

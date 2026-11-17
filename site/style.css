@@ -89,6 +89,25 @@ h2 { font-size: 32px; letter-spacing: -0.02em; margin: 0 0 8px; }
 .sub { color: var(--sub); margin: 0 0 28px; }
 h3 { margin: 0 0 6px; font-size: 17px; }
 
+.section.wide { max-width: 1180px; }
+.examples { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.example:first-child { grid-column: 1 / -1; }
+.example:first-child .example-stage { height: 360px; }
+.example { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.example-stage {
+  height: 470px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+  background-color: #0e0e0e;
+  background-image:
+    linear-gradient(45deg, #161616 25%, transparent 25%), linear-gradient(-45deg, #161616 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #161616 75%), linear-gradient(-45deg, transparent 75%, #161616 75%);
+  background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+.example-stage iframe { flex: none; border: 0; background: transparent; transform-origin: center center; }
+.example-info { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.example-info p { margin: 0 0 10px; color: #cfcfcf; font-size: 14px; flex: 1; }
+.example-info .row { display: flex; justify-content: space-between; align-items: center; }
+.example-info .row span { color: var(--sub); font-size: 13px; }
+
 .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
 .steps li { display: flex; gap: 16px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
 .steps p { margin: 0 0 12px; color: #cfcfcf; }
@@ -124,6 +143,7 @@ details p { color: #cfcfcf; margin: 10px 0 0; }
   .pane:first-child { border-right: 0; border-bottom: 1px solid var(--line); }
   textarea { height: 260px; }
   .stage { height: 320px; }
-  .cards, .features { grid-template-columns: 1fr; }
+  .cards, .features, .examples { grid-template-columns: 1fr; }
+  .example-stage, .example:first-child .example-stage { height: 300px; }
   #add { display: none; }
 }

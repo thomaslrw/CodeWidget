@@ -247,9 +247,87 @@ $("openApp").onclick = async () => {
   window.location.href = `codewidget://open?${params}`;
 };
 
+// ---------- Examples ----------
+
+const EXAMPLES = [
+  {
+    file: "examples/ai-streak.html",
+    name: "AI shipping streak",
+    width: 760,
+    height: 300,
+    about: "A year of days you built something with AI, with streaks and a monthly trend. Click any day to log it.",
+  },
+  {
+    file: "examples/prompt-library.html",
+    name: "Prompt library",
+    width: 340,
+    height: 420,
+    about: "Your best prompts, one click to copy. Comes with five good ones. Add your own with +.",
+  },
+  {
+    file: "examples/ai-news.html",
+    name: "AI news",
+    width: 360,
+    height: 420,
+    about: "The most talked-about AI stories from the last two days, refreshed every 15 minutes.",
+  },
+];
+
+function fitExamples() {
+  for (const frame of document.querySelectorAll(".example-stage iframe")) {
+    const box = frame.parentElement;
+    const w = Number(frame.dataset.w);
+    const h = Number(frame.dataset.h);
+    const scale = Math.min(1, (box.clientWidth - 24) / w, (box.clientHeight - 24) / h);
+    frame.style.transform = `scale(${scale})`;
+  }
+}
+
+async function loadExamples() {
+  const list = $("exampleList");
+  for (const ex of EXAMPLES) {
+    let source = "";
+    try {
+      source = await (await fetch(ex.file)).text();
+    } catch {
+      continue;
+    }
+    const card = document.createElement("div");
+    card.className = "example";
+    card.innerHTML = `<div class="example-stage"><iframe title="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" allow="clipboard-write" loading="lazy"></iframe></div>
+      <div class="example-info"><h3></h3><p></p><div class="row"><span></span><button class="btn small">Use this</button></div></div>`;
+    const frame = card.querySelector("iframe");
+    frame.title = ex.name;
+    frame.dataset.w = ex.width;
+    frame.dataset.h = ex.height;
+    frame.style.width = `${ex.width}px`;
+    frame.style.height = `${ex.height}px`;
+    frame.srcdoc = CW.toDocument(source);
+    card.querySelector("h3").textContent = ex.name;
+    card.querySelector("p").textContent = ex.about;
+    card.querySelector(".row span").textContent = `${ex.width} x ${ex.height}`;
+    card.querySelector("button").onclick = () => {
+      code.value = source;
+      $("name").value = ex.name;
+      widthField.value = ex.width;
+      heightField.value = ex.height;
+      syncPreset();
+      layout();
+      changed();
+      render();
+      $("maker").scrollIntoView({ behavior: "smooth" });
+      toast(`${ex.name} loaded. Press Add to desktop when you're ready.`);
+    };
+    list.append(card);
+  }
+  fitExamples();
+}
+window.addEventListener("resize", fitExamples);
+
 // ---------- Start ----------
 
 const draft = store.get("cw-draft");
 code.value = draft === null ? EXAMPLE : draft;
 layout();
 render();
+loadExamples();
