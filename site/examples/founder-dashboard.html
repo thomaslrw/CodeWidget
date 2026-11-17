@@ -1,0 +1,214 @@
+<!-- Founder dashboard: your software's MRR and how it's grown over 12 months, plus new sign-ups, active users,
+     churn and unread support emails. Shows example numbers until you put in your own with the gear button. -->
+<div class="w">
+  <div class="head">
+    <div>
+      <div class="t" id="app">Your app</div>
+      <div class="s" id="sub">Example numbers · add yours with ⚙</div>
+    </div>
+    <button id="gear" title="Edit your numbers">⚙</button>
+  </div>
+  <div class="mrr">
+    <div class="label">MRR</div>
+    <div class="big"><span id="mrr">-</span><span class="chg" id="mrrChg"></span></div>
+  </div>
+  <div class="chart">
+    <svg id="svg" viewBox="0 0 328 120" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#7b8cff" stop-opacity="0.45" />
+          <stop offset="1" stop-color="#7b8cff" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#5b6cff" />
+          <stop offset="1" stop-color="#b59cff" />
+        </linearGradient>
+      </defs>
+      <g id="grid"></g>
+      <path id="area" fill="url(#fill)" />
+      <path id="path" fill="none" stroke="url(#line)" stroke-width="2.5" stroke-linecap="round" />
+    </svg>
+    <div class="dot" id="dot"></div>
+    <div class="months" id="months"></div>
+  </div>
+  <div class="tiles">
+    <div class="tile"><span>New sign-ups</span><b id="signups">-</b><em id="signupsChg"></em></div>
+    <div class="tile"><span>Active users</span><b id="active">-</b><em class="muted">right now</em></div>
+    <div class="tile"><span>Churn</span><b id="churn">-</b><em class="muted">this month</em></div>
+    <div class="tile"><span>Support inbox</span><b id="support">-</b><em id="supportNote"></em></div>
+  </div>
+  <form class="settings" id="settings" hidden>
+    <div class="t">Your numbers</div>
+    <label>App name<input id="fName" maxlength="30"></label>
+    <label>MRR, last 12 months (oldest first, comma separated)<input id="fMrr" placeholder="1200, 1500, 1900, ..."></label>
+    <div class="two">
+      <label>Currency<input id="fCur" maxlength="3" placeholder="£"></label>
+      <label>Churn %<input id="fChurn" inputmode="decimal"></label>
+    </div>
+    <div class="two">
+      <label>Sign-ups this month<input id="fSign" inputmode="numeric"></label>
+      <label>Sign-ups last month<input id="fSignLast" inputmode="numeric"></label>
+    </div>
+    <div class="two">
+      <label>Active users<input id="fActive" inputmode="numeric"></label>
+      <label>Unread support emails<input id="fSupport" inputmode="numeric"></label>
+    </div>
+    <div class="row">
+      <button type="submit" class="primary">Save</button>
+      <button type="button" id="example">Example numbers</button>
+      <button type="button" id="close">Cancel</button>
+    </div>
+  </form>
+</div>
+<style>
+  * { box-sizing: border-box; }
+  .w {
+    height: 100vh; padding: 16px; border-radius: 20px; background: #000; color: #eef0f6; position: relative; overflow: hidden;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif; display: flex; flex-direction: column; gap: 10px;
+    border: 1px solid #22253a;
+  }
+  .head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .t { font-weight: 700; font-size: 16px; }
+  .s { color: #8b8fa3; font-size: 12px; margin-top: 2px; }
+  button { height: 30px; min-width: 30px; border-radius: 15px; background: #171a26; color: #dfe2ef; border: 1px solid #282c40; cursor: pointer; font: 13px inherit; padding: 0 9px; }
+  button:hover { border-color: #7b8cff; color: #9fadff; }
+  .label { color: #8b8fa3; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .big { display: flex; align-items: baseline; gap: 10px; }
+  #mrr { font-size: 38px; font-weight: 800; letter-spacing: -1.5px; font-variant-numeric: tabular-nums; }
+  .chg { font-size: 12px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+  .up { color: #4ade80; background: rgba(74, 222, 128, 0.12); } .down { color: #f87171; background: rgba(248, 113, 113, 0.12); }
+  .chart { position: relative; flex: 1; min-height: 100px; display: flex; flex-direction: column; }
+  svg { width: 100%; flex: 1 1 0; min-height: 0; height: 0; overflow: visible; }
+  #grid line { stroke: #1d2030; stroke-width: 1; }
+  #path { filter: drop-shadow(0 0 6px rgba(123, 140, 255, 0.6)); stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 1.6s ease forwards; }
+  #area { opacity: 0; animation: fade 1s .6s ease forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes fade { to { opacity: 1; } }
+  .dot { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #c7b8ff; box-shadow: 0 0 0 4px rgba(181, 156, 255, 0.2), 0 0 14px #b59cff; animation: pulse 2s infinite; opacity: 0; }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(181, 156, 255, 0.2), 0 0 14px #b59cff; } 50% { box-shadow: 0 0 0 9px rgba(181, 156, 255, 0), 0 0 14px #b59cff; } }
+  .months { display: flex; justify-content: space-between; color: #5f6378; font-size: 9.5px; padding-top: 4px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tile { background: #12141d; border: 1px solid #1f2232; border-radius: 12px; padding: 9px 11px; display: flex; flex-direction: column; }
+  .tile span { color: #8b8fa3; font-size: 10.5px; }
+  .tile b { font-size: 20px; font-weight: 700; margin-top: 1px; font-variant-numeric: tabular-nums; }
+  .tile em { font-style: normal; font-size: 10.5px; margin-top: 1px; }
+  .tile em.muted { color: #5f6378; }
+  .tile em.good { color: #4ade80; } .tile em.bad { color: #f87171; } .tile em.warn { color: #fbbf24; }
+  .settings { position: absolute; inset: 0; background: #000; padding: 14px 16px; display: flex; flex-direction: column; gap: 7px; z-index: 2; overflow-y: auto; }
+  .settings[hidden] { display: none; }
+  label { display: flex; flex-direction: column; gap: 3px; font-size: 11px; color: #a7abc0; }
+  input { width: 100%; background: #151827; color: #eef0f6; border: 1px solid #282c40; border-radius: 8px; padding: 6px 8px; font: 13px inherit; outline: none; min-width: 0; }
+  input:focus { border-color: #7b8cff; }
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .primary { background: #7b8cff; border-color: #7b8cff; color: #0c0d12; font-weight: 700; }
+  .primary:hover { background: #9aa7ff; color: #0c0d12; }
+</style>
+<script>
+  const KEY = "founder-dashboard";
+  const EXAMPLE = {
+    name: "Your app", cur: "£",
+    mrr: [1240, 1610, 1890, 2350, 2720, 3410, 3980, 4620, 5310, 6180, 7450, 8420],
+    signups: 142, signupsLast: 118, active: 1204, churn: 2.1, support: 5,
+  };
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem(KEY)); } catch {}
+  let isExample = !data;
+  if (!data) data = EXAMPLE;
+
+  const $ = (id) => document.getElementById(id);
+  const money = (n) => `${data.cur}${Math.round(n).toLocaleString()}`;
+  const pct = (a, b) => (b ? Math.round(((a - b) / b) * 1000) / 10 : 0);
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  // A smooth line through the points (Catmull-Rom turned into curves).
+  function smooth(pts) {
+    let d = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += ` C${c1[0]},${c1[1]} ${c2[0]},${c2[1]} ${p2[0]},${p2[1]}`;
+    }
+    return d;
+  }
+
+  function draw() {
+    const m = data.mrr.length ? data.mrr : [0];
+    $("app").textContent = data.name || "Your app";
+    $("sub").textContent = isExample ? "Example numbers · add yours with ⚙" : "Last 12 months";
+    const now = m[m.length - 1];
+    const prev = m[m.length - 2] ?? now;
+    $("mrr").textContent = money(now);
+    const ch = pct(now, prev);
+    $("mrrChg").textContent = `${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch)}%`;
+    $("mrrChg").className = `chg ${ch >= 0 ? "up" : "down"}`;
+
+    // The chart.
+    const W = 328, H = 120, pad = 8;
+    const max = Math.max(...m) * 1.08 || 1;
+    const pts = m.map((v, i) => [m.length === 1 ? W : (i / (m.length - 1)) * W, H - pad - (v / max) * (H - pad * 2)]);
+    const line = smooth(pts);
+    $("path").setAttribute("d", line);
+    $("area").setAttribute("d", `${line} L${W},${H} L0,${H} Z`);
+    $("grid").innerHTML = [0.25, 0.5, 0.75].map((f) => `<line x1="0" x2="${W}" y1="${H * f}" y2="${H * f}" />`).join("");
+    const last = pts[pts.length - 1];
+    const dot = $("dot");
+    const svgBox = $("svg").getBoundingClientRect();
+    const box = dot.parentElement.getBoundingClientRect();
+    dot.style.left = `${svgBox.left - box.left + (last[0] / W) * svgBox.width}px`;
+    dot.style.top = `${svgBox.top - box.top + (last[1] / H) * svgBox.height}px`;
+    setTimeout(() => (dot.style.opacity = 1), 1500);
+    const nowMonth = new Date().getMonth();
+    $("months").innerHTML = m.map((_, i) => `<span>${MONTHS[(nowMonth - (m.length - 1 - i) + 120) % 12]}</span>`).join("");
+
+    // Tiles.
+    $("signups").textContent = Number(data.signups || 0).toLocaleString();
+    const sc = pct(data.signups, data.signupsLast);
+    $("signupsChg").textContent = data.signupsLast ? `${sc >= 0 ? "▲" : "▼"} ${Math.abs(sc)}% vs last month` : "";
+    $("signupsChg").className = sc >= 0 ? "good" : "bad";
+    $("active").textContent = Number(data.active || 0).toLocaleString();
+    $("churn").textContent = `${data.churn ?? 0}%`;
+    $("support").textContent = data.support ?? 0;
+    $("supportNote").textContent = data.support ? "unread emails" : "inbox zero";
+    $("supportNote").className = data.support > 10 ? "bad" : data.support ? "warn" : "good";
+  }
+
+  const form = $("settings");
+  $("gear").onclick = () => {
+    $("fName").value = data.name;
+    $("fCur").value = data.cur;
+    $("fMrr").value = data.mrr.join(", ");
+    $("fSign").value = data.signups;
+    $("fSignLast").value = data.signupsLast;
+    $("fActive").value = data.active;
+    $("fChurn").value = data.churn;
+    $("fSupport").value = data.support;
+    form.hidden = false;
+  };
+  $("close").onclick = () => (form.hidden = true);
+  $("example").onclick = () => {
+    data = EXAMPLE;
+    isExample = true;
+    try { localStorage.removeItem(KEY); } catch {}
+    form.hidden = true;
+    draw();
+  };
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const num = (id) => Number(String($(id).value).replace(/[^0-9.\-]/g, "")) || 0;
+    const mrr = $("fMrr").value.split(/[,\s]+/).map((x) => Number(x.replace(/[^0-9.\-]/g, ""))).filter((x) => Number.isFinite(x) && x >= 0).slice(-12);
+    data = {
+      name: $("fName").value.trim() || "Your app",
+      cur: $("fCur").value.trim() || "£",
+      mrr: mrr.length ? mrr : [0],
+      signups: num("fSign"), signupsLast: num("fSignLast"), active: num("fActive"), churn: num("fChurn"), support: num("fSupport"),
+    };
+    isExample = false;
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {}
+    form.hidden = true;
+    draw();
+  };
+  window.addEventListener("resize", draw);
+  draw();
+</script>

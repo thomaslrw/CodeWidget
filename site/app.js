@@ -84,8 +84,10 @@ function layout() {
   const { width, height } = size();
   frameBox.style.width = `${width}px`;
   frameBox.style.height = `${height}px`;
-  const scale = Math.min(1, (stage.clientWidth - 32) / width, (stage.clientHeight - 32) / height);
-  frameBox.style.transform = `scale(${Math.max(0.05, scale)})`;
+  // Fit the width of the box (and never taller than 560px), then make the box just tall enough for it.
+  const scale = Math.max(0.05, Math.min(1, (stage.clientWidth - 40) / width, 560 / height));
+  frameBox.style.transform = `scale(${scale})`;
+  stage.style.height = `${Math.round(height * scale) + 40}px`;
   $("previewSize").textContent = `${width} x ${height}${scale < 1 ? ` (shown at ${Math.round(scale * 100)}%)` : ""}`;
 }
 
@@ -235,11 +237,25 @@ const EXAMPLES = [
     about: "Watches your app's errors in Sentry and lights up when a new bug appears. Shows demo data until you connect your Sentry.",
   },
   {
+    file: "examples/founder-dashboard.html",
+    name: "Founder dashboard",
+    width: 360,
+    height: 420,
+    about: "",
+  },
+  {
     file: "examples/ai-news.html",
     name: "AI news",
     width: 360,
     height: 420,
     about: "The most talked-about AI stories from the last two days, refreshed every 15 minutes.",
+  },
+  {
+    file: "examples/ai-orb.html",
+    name: "AI orb",
+    width: 360,
+    height: 420,
+    about: "",
   },
 ];
 
