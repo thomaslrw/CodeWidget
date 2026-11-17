@@ -5,10 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CodeWidget: paste code, get any desktop widget</title>
 <meta name="description" content="Paste widget code from any AI, preview it live, and pin it to your Mac, Windows or Linux desktop. Free and open source.">
-<meta property="og:title" content="CodeWidget">
-<meta property="og:description" content="Paste code. Get any desktop widget. Free and open source.">
-<meta property="og:image" content="icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thomaslrw.github.io/CodeWidget/">
+<meta property="og:title" content="CodeWidget: paste code, get any desktop widget">
+<meta property="og:description" content="Ask any AI for a widget, paste the code, see it live and pin it to your desktop. Free and open source.">
+<meta property="og:image" content="https://thomaslrw.github.io/CodeWidget/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://thomaslrw.github.io/CodeWidget/og.png">
+<meta name="theme-color" content="#0a0a0a">
 <link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,13 +34,42 @@
 </nav>
 
 <header class="hero" id="top">
-  <div class="tag">Free and open source &middot; Mac, Windows and Linux</div>
-  <h1>Paste code.<br>Get any desktop widget.</h1>
-  <p class="lead">Ask any AI for a widget, paste the code below and see it live. Then add it to your desktop in one click.</p>
+  <div class="badges">
+    <a class="badge" href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener"><span class="pulse"></span>Open source &middot; MIT</a>
+    <a class="badge" href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener" id="stars">&#9733; Star on GitHub</a>
+    <a class="badge" href="https://www.instagram.com/thomas.lrw/" target="_blank" rel="noopener">Built by Thomas</a>
+  </div>
+  <h1>Paste code.<br><span class="soft">Get any desktop widget.</span></h1>
+  <p class="lead">Ask any AI for a widget, paste the code and see it live. Then pin it to your desktop in one click.</p>
+  <div class="ctas">
+    <a class="btn big" href="#maker">Try it now</a>
+    <a class="btn big ghost" href="#download" data-download>Download</a>
+  </div>
+
+  <div class="showcase reveal" id="showcase" aria-label="A desktop with CodeWidget widgets on it">
+    <div class="desk" id="desk">
+      <div class="menubar">
+        <span class="mb-left"><b>CodeWidget</b><span>File</span><span>Edit</span><span>Widgets</span><span>Window</span></span>
+        <span class="mb-right" id="mbClock"></span>
+      </div>
+      <div class="dw" data-src="examples/ai-streak.html" data-w="760" data-h="300" data-x="48" data-y="62" data-s="0.82"></div>
+      <div class="dw" data-src="examples/bug-radar.html" data-w="360" data-h="420" data-x="48" data-y="330" data-s="0.71"></div>
+      <div class="dw" data-src="examples/ai-news.html" data-w="360" data-h="420" data-x="878" data-y="62" data-s="0.76"></div>
+      <div class="cw-win" id="cwWin">
+        <div class="cw-title"><span class="lights"><i></i><i></i><i></i></span><span>CodeWidget</span><span class="cw-add" id="cwAdd">Add widget</span></div>
+        <div class="cw-body">
+          <pre class="cw-code" id="typer"></pre>
+          <div class="cw-preview"><span>Preview</span></div>
+        </div>
+      </div>
+      <div class="dw fly" id="flyer" data-src="examples/clock.html" data-w="400" data-h="200" data-x="864" data-y="414" data-s="0.72"></div>
+      <div class="dock"><i></i><i></i><i></i><i class="me"></i><i></i><i></i></div>
+    </div>
+  </div>
   <p class="mobile-note">CodeWidget is for desktop computers. Open this page on your Mac or PC to make a widget.</p>
 </header>
 
-<section class="maker" id="maker">
+<section class="reveal maker" id="maker">
   <div class="maker-bar">
     <div class="bar-left">
       <input id="name" class="field" placeholder="Widget name" maxlength="60" spellcheck="false">
@@ -65,13 +104,13 @@
   </div>
 </section>
 
-<section class="section wide" id="examples">
+<section class="reveal section wide" id="examples">
   <h2>Examples</h2>
   <p class="sub">Real widgets, running live. Press <b>Use this</b> to load one into the editor, change anything, then add it to your desktop.</p>
   <div class="examples" id="exampleList"></div>
 </section>
 
-<section class="section" id="download">
+<section class="reveal section" id="download">
   <h2>Add it to your desktop</h2>
   <p class="sub">Widgets live on your desktop through the free CodeWidget app. Three steps, once.</p>
   <ol class="steps">
@@ -80,6 +119,12 @@
       <div>
         <h3>Download CodeWidget</h3>
         <p id="dlText">We've picked the right version for your computer.</p>
+        <div class="os">
+          <span class="os-pill" data-os="mac"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M1 19h22"/></svg>macOS</span>
+          <span class="os-pill" data-os="windows"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Windows</span>
+          <span class="os-pill" data-os="linux"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M7 8l3 2-3 2M12 12h4"/></svg>Linux</span>
+          <span class="version" id="version"></span>
+        </div>
         <a class="btn" id="dlBtn" href="https://github.com/thomaslrw/CodeWidget/releases/latest">Download</a>
         <p class="small muted" id="dlOther"></p>
       </div>
@@ -103,7 +148,7 @@
   </ol>
 </section>
 
-<section class="section" id="how">
+<section class="reveal section" id="how">
   <h2>How it works</h2>
   <div class="cards">
     <div class="card"><h3>Ask an AI</h3><p>Press <b>Copy AI prompt</b>, paste it into Claude or ChatGPT and say what you want: a habit tracker, a countdown, a to-do list, a clock.</p></div>
@@ -118,7 +163,7 @@
   </ul>
 </section>
 
-<section class="section" id="faq">
+<section class="reveal section" id="faq">
   <h2>FAQ</h2>
   <details><summary>Is it free?</summary><p>Yes. It's free and open source under the MIT licence. The code is on <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>.</p></details>
   <details><summary>Which computers does it work on?</summary><p>Mac (Apple silicon and Intel), Windows and Linux. The download button picks the right one for you.</p></details>
@@ -129,8 +174,8 @@
 </section>
 
 <footer class="footer">
-  <span>CodeWidget &middot; MIT licence</span>
-  <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>
+  <span>Built by <a href="https://www.instagram.com/thomas.lrw/" target="_blank" rel="noopener">Thomas</a> with AI &middot; Free and open source (MIT)</span>
+  <span class="foot-links"><a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a><a href="https://www.instagram.com/thomas.lrw/" target="_blank" rel="noopener">Instagram</a></span>
 </footer>
 
 <div id="toast" class="toast" hidden></div>

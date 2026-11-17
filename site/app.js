@@ -182,6 +182,8 @@ const INSTALL = {
     $("installSteps").innerHTML = INSTALL.mac;
     return;
   }
+  const pill = document.querySelector(`.os-pill[data-os="${os.startsWith("mac") ? "mac" : os}"]`);
+  if (pill) pill.classList.add("on");
   btn.textContent = LABELS[os];
   btn.href = fileUrl(FILES[os]);
   for (const a of document.querySelectorAll("[data-download]")) a.textContent = LABELS[os].replace("Download for ", "Get it for ");
@@ -288,6 +290,148 @@ async function loadExamples() {
   fitExamples();
 }
 window.addEventListener("resize", fitExamples);
+
+// ---------- The live desktop in the hero ----------
+
+const desk = $("desk");
+const showcase = $("showcase");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function fitDesk() {
+  if (!desk) return;
+  desk.style.transform = `scale(${showcase.clientWidth / 1200})`;
+}
+window.addEventListener("resize", fitDesk);
+
+/** Places a desktop widget at its spot and size, scaled, and loads its code. */
+async function mountDeskWidget(el) {
+  const w = Number(el.dataset.w);
+  const h = Number(el.dataset.h);
+  const sc = Number(el.dataset.s);
+  el.style.left = `${el.dataset.x}px`;
+  el.style.top = `${el.dataset.y}px`;
+  el.style.width = `${w}px`;
+  el.style.height = `${h}px`;
+  if (!el.classList.contains("fly")) el.style.transform = `scale(${sc})`;
+  const frame = document.createElement("iframe");
+  frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+  frame.setAttribute("tabindex", "-1");
+  frame.title = "";
+  el.append(frame);
+  try {
+    frame.srcdoc = CW.toDocument(await (await fetch(`${el.dataset.src}?v=${V}`)).text());
+  } catch {
+    /* leave it empty */
+  }
+}
+
+function menuClock() {
+  const c = $("mbClock");
+  if (!c) return;
+  const now = new Date();
+  c.textContent = `${now.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })}  ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+// The story in three seconds: code is pasted, the preview builds, the widget flies onto the desktop.
+const TYPED = [
+  ["c", "<!-- A clock with the date -->"],
+  ["", '<div class="clock">'],
+  ["", '  <div id="time">00:00</div>'],
+  ["", '  <div id="date"></div>'],
+  ["", "</div>"],
+  ["k", "<style>"],
+  ["", "  .clock { height: 100vh;"],
+  ["", "    display: flex; ... }"],
+  ["k", "</style>"],
+  ["k", "<script>"],
+  ["", "  setInterval(tick, 1000);"],
+  ["k", "</script>"],
+];
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function playStory() {
+  const win = $("cwWin");
+  const flyer = $("flyer");
+  const typer = $("typer");
+  if (!win || !flyer) return;
+  // Where the clock sits in the editor's preview, and where it ends up on the desktop (in desk pixels).
+  const fx = Number(flyer.dataset.x);
+  const fy = Number(flyer.dataset.y);
+  const inPreview = `translate(${640 - fx}px, ${272 - fy}px) scale(0.575)`;
+  const onDesk = `scale(${flyer.dataset.s})`;
+  if (reduceMotion) {
+    win.classList.add("gone");
+    flyer.style.transform = onDesk;
+    flyer.style.opacity = 1;
+    return;
+  }
+  flyer.style.transition = "none";
+  flyer.style.transform = inPreview;
+  await sleep(900);
+  for (const [cls, line] of TYPED) {
+    const span = document.createElement("span");
+    if (cls) span.className = cls;
+    typer.append(span);
+    for (let i = 0; i < line.length; i += 3) {
+      span.textContent = line.slice(0, i + 3);
+      await sleep(14);
+    }
+    typer.append("\n");
+  }
+  win.classList.add("done");
+  flyer.style.transition = "opacity .5s ease";
+  flyer.style.opacity = 1;
+  await sleep(900);
+  $("cwAdd").classList.add("press");
+  await sleep(250);
+  $("cwAdd").classList.remove("press");
+  flyer.style.transition = "";
+  flyer.style.transform = onDesk;
+  win.classList.add("gone");
+}
+
+if (desk) {
+  fitDesk();
+  menuClock();
+  setInterval(menuClock, 15000);
+  document.querySelectorAll(".dw").forEach(mountDeskWidget);
+  // Start the story once the desktop is on screen.
+  new IntersectionObserver((entries, obs) => {
+    if (entries.some((e) => e.isIntersecting)) {
+      obs.disconnect();
+      playStory();
+    }
+  }, { threshold: 0.35 }).observe(showcase);
+}
+
+// ---------- Fade in as sections come into view ----------
+
+const revealer = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) {
+      e.target.classList.add("in");
+      revealer.unobserve(e.target);
+    }
+  }
+}, { threshold: 0.08 });
+document.querySelectorAll(".reveal").forEach((el) => revealer.observe(el));
+
+// ---------- Live numbers from GitHub: stars and the latest version ----------
+
+fetch("https://api.github.com/repos/thomaslrw/CodeWidget")
+  .then((r) => r.json())
+  .then((d) => {
+    if (typeof d.stargazers_count === "number" && d.stargazers_count > 0) {
+      $("stars").textContent = `★ ${d.stargazers_count.toLocaleString()} on GitHub`;
+    }
+  })
+  .catch(() => {});
+fetch(`${REPO.replace("github.com", "api.github.com/repos")}/releases/latest`)
+  .then((r) => r.json())
+  .then((d) => {
+    if (d.tag_name) $("version").textContent = `Version ${d.tag_name.replace(/^v/, "")} · free`;
+  })
+  .catch(() => {});
 
 // ---------- Start ----------
 
