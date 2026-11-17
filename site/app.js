@@ -222,14 +222,15 @@ const EXAMPLES = [
     name: "AI shipping streak",
     width: 760,
     height: 300,
-    about: "A year of days you built something with AI, with streaks and a monthly trend. Click any day to log it.",
+    about: "",
+    editorOnly: true,
   },
   {
-    file: "examples/ai-status.html",
-    name: "AI status",
-    width: 360,
-    height: 420,
-    about: "Is Claude, ChatGPT, GitHub or Vercel having problems right now? Live from their status pages, checked every 2 minutes.",
+    file: "examples/app-radar.html",
+    name: "App radar",
+    width: 760,
+    height: 300,
+    about: "Watches your app's errors in Sentry. New errors light up on the radar the moment they happen. Shows demo data until you connect your Sentry.",
   },
   {
     file: "examples/ai-news.html",
@@ -252,7 +253,8 @@ function fitExamples() {
 
 async function loadExamples() {
   const list = $("exampleList");
-  for (const ex of EXAMPLES) {
+  // The first one is already in the editor, so it isn't repeated here.
+  for (const ex of EXAMPLES.filter((e) => !e.editorOnly)) {
     let source = "";
     try {
       source = await (await fetch(`${ex.file}?v=${V}`)).text();
