@@ -250,6 +250,13 @@ const EXAMPLES = [
     height: 420,
     about: "The most talked-about AI stories from the last two days, refreshed every 15 minutes.",
   },
+  {
+    file: "examples/ai-orb.html",
+    name: "AI orb",
+    width: 360,
+    height: 420,
+    about: "",
+  },
 ];
 
 function fitExamples() {
