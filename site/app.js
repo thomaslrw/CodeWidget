@@ -237,6 +237,13 @@ const EXAMPLES = [
     about: "Watches your app's errors in Sentry and lights up when a new bug appears. Shows demo data until you connect your Sentry.",
   },
   {
+    file: "examples/founder-dashboard.html",
+    name: "Founder dashboard",
+    width: 360,
+    height: 420,
+    about: "",
+  },
+  {
     file: "examples/ai-news.html",
     name: "AI news",
     width: 360,
