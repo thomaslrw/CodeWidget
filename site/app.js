@@ -264,7 +264,7 @@ async function loadExamples() {
     const card = document.createElement("div");
     card.className = "example";
     card.innerHTML = `<div class="example-stage"><iframe title="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" allow="clipboard-write" loading="lazy"></iframe></div>
-      <div class="example-info"><h3></h3><p></p><div class="row"><span></span><button class="btn small">Use this</button></div></div>`;
+      <div class="example-info"><h3></h3><button class="btn small">Use this</button></div>`;
     const frame = card.querySelector("iframe");
     frame.title = ex.name;
     frame.dataset.w = ex.width;
@@ -273,8 +273,6 @@ async function loadExamples() {
     frame.style.height = `${ex.height}px`;
     frame.srcdoc = CW.toDocument(source);
     card.querySelector("h3").textContent = ex.name;
-    card.querySelector("p").textContent = ex.about;
-    card.querySelector(".row span").textContent = `${ex.width} x ${ex.height}`;
     card.querySelector("button").onclick = () => {
       code.value = source;
       $("name").value = ex.name;
