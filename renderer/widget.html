@@ -14,7 +14,7 @@
     opacity: 0; transition: opacity .15s; z-index: 10;
     font: 11px -apple-system, "Segoe UI", system-ui, sans-serif; color: #eee;
   }
-  body:hover .bar, .bar.on { opacity: 1; }
+  body.hover .bar, .bar.on { opacity: 1; }
   .grip { -webkit-app-region: drag; cursor: grab; padding: 3px 8px; color: #aaa; letter-spacing: 1px; user-select: none; }
   .bar button {
     -webkit-app-region: no-drag; background: none; border: 0; color: #ddd; cursor: pointer;
@@ -27,7 +27,7 @@
     opacity: 0; transition: opacity .15s;
     background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0.55) 60%, transparent 60%, transparent 70%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0.55) 80%, transparent 80%);
   }
-  body:hover .resize { opacity: 1; }
+  body.hover .resize { opacity: 1; }
   body.resizing iframe { pointer-events: none; }
 </style>
 </head>
@@ -35,7 +35,7 @@
 <iframe id="w" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-write; fullscreen"></iframe>
 <div class="bar" id="bar">
   <span class="grip" title="Drag to move">::: move</span>
-  <button id="top" title="Keep above other windows">Pin</button>
+  <button id="top" title="Keep this widget in front of your other windows">On top</button>
   <button id="edit" title="Edit this widget">Edit</button>
   <button id="hide" title="Hide (bring back from the menu bar icon)">Hide</button>
 </div>

@@ -9,5 +9,7 @@ contextBridge.exposeInMainWorld("cwFrame", {
   hide: () => ipcRenderer.send("widget:hide"),
   toggleTop: () => ipcRenderer.send("widget:toggleTop"),
   edit: () => ipcRenderer.send("widget:edit"),
+  pointerLeft: () => ipcRenderer.send("widget:pointerLeft"),
+  onPointerOut: (fn) => ipcRenderer.on("widget:pointerOut", () => fn()),
   onState: (fn) => ipcRenderer.on("widget:state", (_e, s) => fn(s)),
 });

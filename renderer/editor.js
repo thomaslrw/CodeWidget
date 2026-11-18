@@ -173,7 +173,7 @@ function renderList() {
     acts.append(
       button("Edit", () => startEdit(w.id)),
       button(w.hidden ? "Show" : "Hide", () => window.cw.setHidden(w.id, !w.hidden)),
-      button("Pin", () => window.cw.setOnTop(w.id, !w.onTop), w.onTop),
+      button("On top", () => window.cw.setOnTop(w.id, !w.onTop), w.onTop),
       button("Remove", async () => {
         if (!confirm(`Remove "${w.name}"? Its saved data goes too.`)) return;
         await window.cw.remove(w.id);

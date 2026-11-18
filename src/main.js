@@ -25,6 +25,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const { toDocument, clampSize, readOpenLink } = require("./code");
 const { freeSpot, snap } = require("./place");
+const { stickToDesktop } = require("./mac-desktop");
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -273,8 +274,13 @@ function openWidget(w) {
   } catch {
     // Not supported on every system.
   }
+  // Mac: stay on the desktop when someone clicks the wallpaper or uses Show Desktop.
+  stickToDesktop(win);
   win.loadURL(`cw://app/widget.html?id=${w.id}`);
-  win.once("ready-to-show", () => win.showInactive());
+  win.once("ready-to-show", () => {
+    stickToDesktop(win);
+    win.showInactive();
+  });
   let moveTimer = null;
   win.on("move", () => {
     clearTimeout(moveTimer);
@@ -533,6 +539,21 @@ function registerIpc() {
   });
 
   // From a widget's own frame. The widget is worked out from the window that sent the message.
+  // The move handle is a drag area, and the page gets no mouse events over it, so the page can't tell
+  // the pointer is still there. When the page loses the pointer, the app checks where it really is.
+  ipcMain.on("widget:pointerLeft", (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win || win.isDestroyed() || win.hoverTimer) return;
+    win.hoverTimer = setInterval(() => {
+      const p = screen.getCursorScreenPoint();
+      const b = win.isDestroyed() ? null : win.getBounds();
+      if (b && p.x >= b.x && p.x < b.x + b.width && p.y >= b.y && p.y < b.y + b.height) return;
+      clearInterval(win.hoverTimer);
+      win.hoverTimer = null;
+      if (b) win.webContents.send("widget:pointerOut");
+    }, 150);
+  });
+
   ipcMain.handle("widget:info", (event) => {
     const id = idOfSender(event);
     const w = id && findWidget(id);

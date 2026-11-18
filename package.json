@@ -1,7 +1,7 @@
 {
   "name": "codewidget",
   "productName": "CodeWidget",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Paste any widget code, preview it instantly and pin it to your desktop.",
   "main": "src/main.js",
   "author": "Thomas Whitehead",
@@ -19,24 +19,57 @@
   "build": {
     "appId": "com.thomaslrw.codewidget",
     "productName": "CodeWidget",
-    "files": ["src/**", "renderer/**", "assets/**", "package.json"],
-    "directories": { "output": "dist", "buildResources": "assets" },
-    "protocols": [{ "name": "CodeWidget", "schemes": ["codewidget"] }],
+    "npmRebuild": false,
+    "files": [
+      "src/**",
+      "renderer/**",
+      "assets/**",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "protocols": [
+      {
+        "name": "CodeWidget",
+        "schemes": [
+          "codewidget"
+        ]
+      }
+    ],
     "mac": {
       "category": "public.app-category.utilities",
       "icon": "assets/icon.png",
       "identity": null,
-      "target": ["dir"]
+      "target": [
+        "dir"
+      ]
     },
-    "dmg": { "artifactName": "CodeWidget-mac-${arch}.dmg" },
-    "win": { "icon": "assets/icon.png", "target": ["nsis"] },
-    "nsis": { "artifactName": "CodeWidget-windows-${arch}-setup.exe", "oneClick": true },
+    "dmg": {
+      "artifactName": "CodeWidget-mac-${arch}.dmg"
+    },
+    "win": {
+      "icon": "assets/icon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "artifactName": "CodeWidget-windows-${arch}-setup.exe",
+      "oneClick": true
+    },
     "linux": {
       "icon": "assets/icon.png",
       "category": "Utility",
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "artifactName": "CodeWidget-linux-${arch}.AppImage"
     },
     "publish": null
+  },
+  "dependencies": {
+    "koffi": "3.3.8"
   }
 }
