@@ -1,7 +1,7 @@
 {
   "name": "codewidget",
   "productName": "CodeWidget",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Paste any widget code, preview it instantly and pin it to your desktop.",
   "main": "src/main.js",
   "author": "Thomas Whitehead",

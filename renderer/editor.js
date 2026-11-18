@@ -237,10 +237,6 @@ addBtn.onclick = async () => {
   }
 };
 
-$("login").addEventListener("change", async (e) => {
-  e.target.checked = await window.cw.setOpenAtLogin(e.target.checked);
-});
-
 // Code sent from the website: fill the editor so they only need to press Add widget.
 function importCode(data) {
   if (!data || !data.code) return;
@@ -265,8 +261,6 @@ window.cw.onEdit(startEdit);
   layoutPreview();
   refreshPreview();
   await loadList();
-  const s = await window.cw.settings();
-  $("login").checked = !!s.openAtLogin;
   const pending = await window.cw.pendingEdit();
   if (pending) startEdit(pending);
   importCode(await window.cw.pendingImport());
