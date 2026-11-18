@@ -352,17 +352,18 @@ function menuClock() {
 
 // The story in three seconds: code is pasted, the preview builds, the widget flies onto the desktop.
 const TYPED = [
-  ["c", "<!-- A clock with the date -->"],
-  ["", '<div class="clock">'],
-  ["", '  <div id="time">00:00</div>'],
-  ["", '  <div id="date"></div>'],
+  ["c", "<!-- AI orb: ask anything -->"],
+  ["", '<div class="w">'],
+  ["", '  <canvas id="orb"></canvas>'],
+  ["", '  <form id="ask">'],
+  ["", '    <input placeholder="Ask anything...">'],
+  ["", "  </form>"],
   ["", "</div>"],
   ["k", "<style>"],
-  ["", "  .clock { height: 100vh;"],
-  ["", "    display: flex; ... }"],
+  ["", "  .w { background: #000; ... }"],
   ["k", "</style>"],
   ["k", "<script>"],
-  ["", "  setInterval(tick, 1000);"],
+  ["", "  fetch(\"api.anthropic.com/...\")"],
   ["k", "</script>"],
 ];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -372,10 +373,16 @@ async function playStory() {
   const flyer = $("flyer");
   const typer = $("typer");
   if (!win || !flyer) return;
-  // Where the clock sits in the editor's preview, and where it ends up on the desktop (in desk pixels).
+  // Where the widget sits in the editor window's preview pane (x 620 to 890, y 180 to 480 on the desk),
+  // and where it ends up on the desktop.
   const fx = Number(flyer.dataset.x);
   const fy = Number(flyer.dataset.y);
-  const inPreview = `translate(${640 - fx}px, ${272 - fy}px) scale(0.575)`;
+  const fw = Number(flyer.dataset.w);
+  const fh = Number(flyer.dataset.h);
+  const ps = Math.min(246 / fw, 276 / fh);
+  const px = 620 + (270 - fw * ps) / 2;
+  const py = 180 + (300 - fh * ps) / 2;
+  const inPreview = `translate(${px - fx}px, ${py - fy}px) scale(${ps})`;
   const onDesk = `scale(${flyer.dataset.s})`;
   if (reduceMotion) {
     win.classList.add("gone");

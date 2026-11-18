@@ -1,10 +1,10 @@
 :root {
-  --bg: #0a0a0a;
-  --panel: #131313;
-  --line: #262626;
+  --bg: #000;
+  --panel: #0b0b0b;
+  --line: #1f1f1f;
   --text: #f0f0f0;
   --sub: #8f8f8f;
-  --field: #1a1a1a;
+  --field: #121212;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -15,13 +15,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 a { color: inherit; }
+* { scrollbar-width: thin; scrollbar-color: #2a2a2a transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: #3a3a3a; }
+::-webkit-scrollbar-corner { background: transparent; }
 button { font: inherit; }
 .muted { color: var(--sub); }
 .small { font-size: 13px; }
 
 .nav {
   position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 24px; background: rgba(10,10,10,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);
+  padding: 12px 24px; background: rgba(0,0,0,0.82); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);
 }
 .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; text-decoration: none; }
 .logo img { width: 24px; height: 24px; }
@@ -34,7 +40,7 @@ button { font: inherit; }
   padding: 10px 18px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap;
   transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .2s ease;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,255,255,0.08); }
+.btn:hover { transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
 .btn.big { padding: 13px 22px; font-size: 15px; border-radius: 11px; }
 .btn:hover { background: #fff; }
@@ -61,14 +67,12 @@ h1 .soft { color: #8f8f8f; }
 /* The live desktop: a 1200 x 660 scene, scaled to fit. */
 .showcase {
   position: relative; margin: 56px auto 0; max-width: 1120px; aspect-ratio: 1200 / 660; border-radius: 16px; overflow: hidden;
-  border: 1px solid #2a2a2a; box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.08);
+  border: 1px solid #222; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
   text-align: left;
 }
 .desk {
   position: absolute; left: 0; top: 0; width: 1200px; height: 660px; transform-origin: 0 0;
-  background:
-    radial-gradient(70% 80% at 20% 0%, rgba(255, 255, 255, 0.05), transparent 70%),
-    linear-gradient(160deg, #171717, #0b0b0b 70%);
+  background: #0b0b0b;
 }
 .menubar {
   position: absolute; left: 0; right: 0; top: 0; height: 30px; display: flex; justify-content: space-between; align-items: center;
@@ -76,12 +80,12 @@ h1 .soft { color: #8f8f8f; }
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .mb-left { display: flex; gap: 18px; } .mb-left span { color: #c9c9c9; }
-.dw { position: absolute; transform-origin: 0 0; border-radius: 20px; filter: drop-shadow(0 18px 40px rgba(0,0,0,0.45)); }
+.dw { position: absolute; transform-origin: 0 0; border-radius: 20px; }
 .dw iframe { width: 100%; height: 100%; border: 0; background: transparent; pointer-events: none; display: block; }
 .dw.fly { opacity: 0; z-index: 4; transition: transform 1s cubic-bezier(.2,.8,.2,1), opacity .4s ease; }
 .cw-win {
   position: absolute; left: 330px; top: 150px; width: 560px; height: 330px; z-index: 3; border-radius: 12px; overflow: hidden;
-  background: rgba(14, 14, 16, 0.96); border: 1px solid #2c2c30; box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+  background: #0c0c0e; border: 1px solid #2c2c30;
   transition: opacity .6s ease, transform .6s ease;
 }
 .cw-win.gone { opacity: 0; transform: scale(0.96); }
@@ -98,7 +102,7 @@ h1 .soft { color: #8f8f8f; }
 .cw-code::after { content: "▍"; color: #f2f2f2; animation: blink 1s steps(1) infinite; }
 .cw-win.done .cw-code::after { content: ""; }
 @keyframes blink { 50% { opacity: 0; } }
-.cw-preview { flex: 1; position: relative; font-size: 11px; color: #6b6b6b; padding: 10px 12px; background-color: #0e0e0e;
+.cw-preview { flex: 1; position: relative; font-size: 11px; color: #6b6b6b; padding: 10px 12px; background-color: #070707;
   background-image: linear-gradient(45deg, #151515 25%, transparent 25%), linear-gradient(-45deg, #151515 25%, transparent 25%),
   linear-gradient(45deg, transparent 75%, #151515 75%), linear-gradient(-45deg, transparent 75%, #151515 75%);
   background-size: 14px 14px; background-position: 0 0, 0 7px, 7px -7px, -7px 0; }
@@ -137,7 +141,7 @@ h1 .soft { color: #8f8f8f; }
 .num { width: 76px; }
 .x { color: var(--sub); }
 .panes {
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 80px rgba(0,0,0,0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   display: grid; grid-template-columns: 1fr 1fr;
   border: 1px solid var(--line); border-radius: 0 0 14px 14px; overflow: hidden;
 }
@@ -149,16 +153,16 @@ h1 .soft { color: #8f8f8f; }
 }
 /* On desktop the code box is exactly as tall as the preview next to it (the preview sets the height). */
 textarea {
-  flex: 1 1 0; min-height: 0; height: 0; resize: none; border: 0; outline: none; padding: 14px; background: #0f0f0f; color: #e6e6e6; tab-size: 2;
+  flex: 1 1 0; min-height: 0; height: 0; resize: none; border: 0; outline: none; padding: 14px; background: #070707; color: #e6e6e6; tab-size: 2;
   font: 12.5px/1.6 "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 /* The preview box fits the widget: its height is set from the widget's size (app.js). */
 .stage {
   flex: none; height: 300px; transition: height .25s ease; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
-  background-color: #0e0e0e;
+  background-color: #070707;
   background-image:
-    linear-gradient(45deg, #161616 25%, transparent 25%), linear-gradient(-45deg, #161616 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #161616 75%), linear-gradient(-45deg, transparent 75%, #161616 75%);
+    linear-gradient(45deg, #0d0d0d 25%, transparent 25%), linear-gradient(-45deg, #0d0d0d 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #0d0d0d 75%), linear-gradient(-45deg, transparent 75%, #0d0d0d 75%);
   background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0;
 }
 .frame { flex: none; outline: 1px dashed #3a3a3a; transform-origin: center center; }
@@ -175,10 +179,10 @@ h3 { margin: 0 0 6px; font-size: 17px; }
 .example:hover { border-color: #3a3a3a; transform: translateY(-2px); }
 .example-stage {
   height: 460px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
-  background-color: #0e0e0e;
+  background-color: #070707;
   background-image:
-    linear-gradient(45deg, #161616 25%, transparent 25%), linear-gradient(-45deg, #161616 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #161616 75%), linear-gradient(-45deg, transparent 75%, #161616 75%);
+    linear-gradient(45deg, #0d0d0d 25%, transparent 25%), linear-gradient(-45deg, #0d0d0d 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #0d0d0d 75%), linear-gradient(-45deg, transparent 75%, #0d0d0d 75%);
   background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0;
 }
 .example-stage iframe { flex: none; border: 0; background: transparent; transform-origin: center center; }
