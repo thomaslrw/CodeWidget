@@ -18,11 +18,13 @@ const {
   session,
   clipboard,
   nativeImage,
+  net,
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const { toDocument, clampSize, readOpenLink } = require("./code");
+const { freeSpot, snap } = require("./place");
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -170,7 +172,39 @@ function openEditor(editId) {
   });
 }
 
-/** Puts a saved position back on a screen that still exists, or centres the widget. */
+// ---------- Placing widgets ----------
+// New widgets go into the first free spot, starting at the top right of the main screen and filling
+// downwards then leftwards, like Mac widgets. They never land on top of another widget.
+// When a widget is dragged and dropped near a screen edge or another widget, it snaps into line.
+/** The current spot of every other visible widget. */
+function otherRects(skipId) {
+  const rects = [];
+  for (const o of store.widgets) {
+    if (o.id === skipId || o.hidden) continue;
+    const win = widgetWindows.get(o.id);
+    if (win && !win.isDestroyed()) {
+      const b = win.getBounds();
+      rects.push({ x: b.x, y: b.y, w: b.width, h: b.height });
+    } else if (Number.isFinite(o.x) && Number.isFinite(o.y)) {
+      rects.push({ x: o.x, y: o.y, w: o.width, h: o.height });
+    }
+  }
+  return rects;
+}
+
+function freeSpotFor(width, height, skipId) {
+  const a = screen.getPrimaryDisplay().workArea;
+  const spot = freeSpot(a, otherRects(skipId), width, height);
+  if (spot) return spot;
+  // The screen is full: centre it, nudged so it doesn't sit exactly on another one.
+  const n = widgetWindows.size % 8;
+  return {
+    x: Math.round(a.x + (a.width - width) / 2 + n * 28),
+    y: Math.round(a.y + (a.height - height) / 2 + n * 28),
+  };
+}
+
+/** Puts a saved position back on a screen that still exists, or finds a free spot. */
 function placeOnScreen(w) {
   const displays = screen.getAllDisplays();
   const fits =
@@ -181,12 +215,17 @@ function placeOnScreen(w) {
       return w.x + 40 > a.x && w.y + 20 > a.y && w.x < a.x + a.width - 40 && w.y < a.y + a.height - 20;
     });
   if (fits) return { x: w.x, y: w.y };
-  const a = screen.getPrimaryDisplay().workArea;
-  const n = widgetWindows.size % 8;
-  return {
-    x: Math.round(a.x + (a.width - w.width) / 2 + n * 28),
-    y: Math.round(a.y + (a.height - w.height) / 2 + n * 28),
-  };
+  return freeSpotFor(w.width, w.height, w.id);
+}
+
+/** Snaps a dropped widget into line with the screen edges and nearby widgets. */
+function snapWidget(id) {
+  const win = widgetWindows.get(id);
+  if (!win || win.isDestroyed()) return;
+  const b = win.getBounds();
+  const { x, y } = snap({ x: b.x, y: b.y, w: b.width, h: b.height }, screen.getDisplayMatching(b).workArea, otherRects(id));
+  if (x !== b.x || y !== b.y) win.setPosition(x, y);
+  rememberBounds(id);
 }
 
 function rememberBounds(id) {
@@ -239,8 +278,11 @@ function openWidget(w) {
   let moveTimer = null;
   win.on("move", () => {
     clearTimeout(moveTimer);
-    moveTimer = setTimeout(() => rememberBounds(w.id), 250);
+    // Linux has no "moved" event, so it snaps once the widget has stopped moving.
+    moveTimer = setTimeout(() => (process.platform === "linux" ? snapWidget(w.id) : rememberBounds(w.id)), 300);
   });
+  // Mac and Windows: snap once, when the drag ends.
+  win.on("moved", () => snapWidget(w.id));
   win.on("closed", () => widgetWindows.delete(w.id));
   widgetWindows.set(w.id, win);
   return win;
@@ -281,11 +323,43 @@ const idOfSender = (event) => {
   return null;
 };
 
+// ---------- Updates ----------
+// The app checks GitHub for a newer release and shows a small notice with a Download button.
+// It never downloads or installs anything by itself.
+const DOWNLOAD_URL = "https://thomaslrw.github.io/CodeWidget/#download";
+let update = null;
+
+function isNewer(a, b) {
+  const pa = a.split(".").map(Number);
+  const pb = b.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) > (pb[i] || 0);
+  }
+  return false;
+}
+
+async function checkForUpdate() {
+  try {
+    const res = await net.fetch("https://api.github.com/repos/thomaslrw/CodeWidget/releases/latest", {
+      headers: { Accept: "application/vnd.github+json", "User-Agent": "CodeWidget" },
+    });
+    if (!res.ok) return;
+    const version = String((await res.json()).tag_name || "").replace(/^v/i, "");
+    if (!/^\d+(\.\d+){0,2}$/.test(version) || !isNewer(version, app.getVersion())) return;
+    update = { version, url: DOWNLOAD_URL };
+    if (editor && !editor.isDestroyed()) editor.webContents.send("update:available", update);
+    buildTrayMenu();
+  } catch {
+    // Offline or GitHub unreachable: try again later.
+  }
+}
+
 // ---------- Tray (menu bar on Mac) ----------
 
 function buildTrayMenu() {
   if (!tray) return;
   const items = [
+    ...(update ? [{ label: `Update available (v${update.version})`, click: () => shell.openExternal(DOWNLOAD_URL) }] : []),
     { label: "Open CodeWidget", click: () => openEditor() },
     { type: "separator" },
     ...store.widgets.map((w) => ({
@@ -323,6 +397,9 @@ function createTray() {
 // ---------- Messages from the pages ----------
 
 function registerIpc() {
+  ipcMain.handle("update:get", () => update);
+  ipcMain.handle("update:open", () => shell.openExternal(DOWNLOAD_URL));
+
   ipcMain.handle("preview:set", (_e, code) => {
     previewCode = String(code ?? "");
     return true;
@@ -519,6 +596,8 @@ app.whenReady().then(() => {
   registerIpc();
   createTray();
   store.widgets.filter((w) => !w.hidden).forEach(openWidget);
+  checkForUpdate();
+  setInterval(checkForUpdate, 6 * 60 * 60 * 1000);
   const atLogin = process.argv.includes("--hidden") || app.getLoginItemSettings().wasOpenedAtLogin;
   if (!atLogin || store.widgets.length === 0 || pendingImport) openEditor();
 });

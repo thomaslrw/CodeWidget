@@ -250,6 +250,16 @@ function importCode(data) {
 }
 
 window.cw.onChanged(loadList);
+
+// A newer version on GitHub: show a small notice with a Download button.
+function showUpdate(u) {
+  if (!u) return;
+  $("updateVersion").textContent = `v${u.version}`;
+  $("update").hidden = false;
+}
+$("updateBtn").onclick = () => window.cw.openUpdate();
+window.cw.onUpdate(showUpdate);
+window.cw.update().then(showUpdate);
 window.cw.onImport(importCode);
 window.cw.onEdit(startEdit);
 
