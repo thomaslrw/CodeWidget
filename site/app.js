@@ -84,10 +84,15 @@ function layout() {
   const { width, height } = size();
   frameBox.style.width = `${width}px`;
   frameBox.style.height = `${height}px`;
-  // Fit the width of the box (and never taller than 560px), then make the box just tall enough for it.
-  const scale = Math.max(0.05, Math.min(1, (stage.clientWidth - 40) / width, 560 / height));
+  // Desktop: a big editor with a roomy preview, the widget scaled to fit inside it.
+  // Phones: the preview box is just tall enough for the widget, so it doesn't waste space.
+  const big = window.innerWidth > 820;
+  const boxH = 520;
+  const scale = big
+    ? Math.max(0.05, Math.min(1, (stage.clientWidth - 48) / width, (boxH - 48) / height))
+    : Math.max(0.05, Math.min(1, (stage.clientWidth - 40) / width, 560 / height));
   frameBox.style.transform = `scale(${scale})`;
-  stage.style.height = `${Math.round(height * scale) + 40}px`;
+  stage.style.height = big ? `${boxH}px` : `${Math.round(height * scale) + 40}px`;
   $("previewSize").textContent = `${width} x ${height}${scale < 1 ? ` (shown at ${Math.round(scale * 100)}%)` : ""}`;
 }
 
