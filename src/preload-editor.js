@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld("cw", {
   update: () => ipcRenderer.invoke("update:get"),
   openUpdate: () => ipcRenderer.invoke("update:open"),
   onUpdate: (fn) => ipcRenderer.on("update:available", (_e, u) => fn(u)),
+  onSettings: (fn) => ipcRenderer.on("settings:changed", () => fn()),
   onChanged: (fn) => ipcRenderer.on("widgets:changed", () => fn()),
   onEdit: (fn) => ipcRenderer.on("editor:edit", (_e, id) => fn(id)),
 });

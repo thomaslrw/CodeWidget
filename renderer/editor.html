@@ -56,7 +56,13 @@
 <footer>
   <div class="list-head">
     <span>Your widgets</span>
-    <span class="update" id="update" hidden>Update available <b id="updateVersion"></b><button id="updateBtn" class="btn small">Download</button></span>
+    <div class="head-right">
+      <span class="update" id="update" hidden>Update available <b id="updateVersion"></b><button id="updateBtn" class="btn small">Download</button></span>
+      <label class="login" title="Widgets only show while CodeWidget is running. Leave this on so they're back on your desktop after a restart.">
+        <span class="login-text"><b>Open at login</b><small>Keeps your widgets on your desktop after a restart</small></span>
+        <input type="checkbox" id="login" class="switch" role="switch">
+      </label>
+    </div>
   </div>
   <div id="list" class="list"></div>
 </footer>

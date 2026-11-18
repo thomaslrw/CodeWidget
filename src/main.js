@@ -323,6 +323,37 @@ const idOfSender = (event) => {
   return null;
 };
 
+// ---------- Open at login ----------
+// Widgets are drawn by the app, so the app has to be running for them to show. Opening at login keeps
+// them on the desktop after a restart. It's on by default (the first time the app runs) and can be
+// turned off in the editor or the menu bar menu.
+// Mac and Windows use the system setting. Linux has no system setting, so the app writes a standard
+// autostart file (only for the AppImage, which has a fixed path to start).
+const LINUX_AUTOSTART = path.join(app.getPath("home"), ".config", "autostart", "codewidget.desktop");
+
+function getOpenAtLogin() {
+  if (process.platform === "linux") return fs.existsSync(LINUX_AUTOSTART);
+  return app.getLoginItemSettings().openAtLogin;
+}
+
+function setOpenAtLogin(on) {
+  try {
+    if (process.platform !== "linux") {
+      app.setLoginItemSettings({ openAtLogin: on, args: ["--hidden"] });
+    } else if (!on) {
+      fs.rmSync(LINUX_AUTOSTART, { force: true });
+    } else if (process.env.APPIMAGE) {
+      fs.mkdirSync(path.dirname(LINUX_AUTOSTART), { recursive: true });
+      fs.writeFileSync(
+        LINUX_AUTOSTART,
+        `[Desktop Entry]\nType=Application\nName=CodeWidget\nExec="${process.env.APPIMAGE}" --hidden\nX-GNOME-Autostart-enabled=true\n`,
+      );
+    }
+  } catch (e) {
+    console.error("Could not change open at login", e);
+  }
+}
+
 // ---------- Updates ----------
 // The app checks GitHub for a newer release and shows a small notice with a Download button.
 // It never downloads or installs anything by itself.
@@ -380,6 +411,18 @@ function buildTrayMenu() {
       click: () => store.widgets.forEach((w) => !w.hidden && setHidden(w.id, true)),
     },
     { type: "separator" },
+    {
+      label: "Open at login (keeps widgets on your desktop)",
+      type: "checkbox",
+      checked: getOpenAtLogin(),
+      click: (item) => {
+        setOpenAtLogin(item.checked);
+        store.openAtLoginSet = true;
+        save();
+        buildTrayMenu();
+        if (editor && !editor.isDestroyed()) editor.webContents.send("settings:changed");
+      },
+    },
     { label: "Quit CodeWidget", click: () => app.quit() },
   ];
   tray.setContextMenu(Menu.buildFromTemplate(items));
@@ -477,13 +520,16 @@ function registerIpc() {
   });
 
   ipcMain.handle("settings:get", () => ({
-    openAtLogin: app.getLoginItemSettings().openAtLogin,
+    openAtLogin: getOpenAtLogin(),
     platform: process.platform,
     version: app.getVersion(),
   }));
   ipcMain.handle("settings:setOpenAtLogin", (_e, on) => {
-    app.setLoginItemSettings({ openAtLogin: !!on, args: ["--hidden"] });
-    return app.getLoginItemSettings().openAtLogin;
+    setOpenAtLogin(!!on);
+    store.openAtLoginSet = true;
+    save();
+    buildTrayMenu();
+    return getOpenAtLogin();
   });
 
   // From a widget's own frame. The widget is worked out from the window that sent the message.
@@ -591,6 +637,11 @@ if (process.defaultApp && process.argv.length >= 2) {
 
 app.whenReady().then(() => {
   loadStore();
+  if (!store.openAtLoginSet && !process.defaultApp) {
+    setOpenAtLogin(true);
+    store.openAtLoginSet = true;
+    save();
+  }
   lockDown();
   protocol.handle("cw", handleRequest);
   registerIpc();

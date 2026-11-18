@@ -251,6 +251,18 @@ function importCode(data) {
 
 window.cw.onChanged(loadList);
 
+// Open at login: widgets only show while the app runs, so this keeps them there after a restart.
+async function loadLogin() {
+  const s = await window.cw.settings();
+  $("login").checked = !!s.openAtLogin;
+}
+$("login").addEventListener("change", async (e) => {
+  e.target.checked = await window.cw.setOpenAtLogin(e.target.checked);
+  if (!e.target.checked) toast("Widgets won't come back after a restart until you open CodeWidget");
+});
+window.cw.onSettings(loadLogin);
+loadLogin();
+
 // A newer version on GitHub: show a small notice with a Download button.
 function showUpdate(u) {
   if (!u) return;
