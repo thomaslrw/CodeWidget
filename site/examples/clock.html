@@ -11,13 +11,21 @@
   }
   #time { font-size: 68px; font-weight: 700; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
   #date { font-size: 15px; color: #8b948f; margin-top: 2px; }
+  #time .colon { animation: colon 1s steps(1) infinite; }
+  @keyframes colon { 50% { opacity: 0.25; } }
 </style>
 <script>
   function tick() {
     const now = new Date();
-    document.getElementById("time").textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const [h, rest] = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }).split(":");
+    const el = document.getElementById("time");
+    el.textContent = h;
+    const c = document.createElement("span");
+    c.className = "colon";
+    c.textContent = ":";
+    el.append(c, rest);
     document.getElementById("date").textContent = now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
   }
   tick();
-  setInterval(tick, 1000);
+  setInterval(tick, 10000);
 </script>
