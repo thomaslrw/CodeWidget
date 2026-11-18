@@ -150,7 +150,9 @@ h1 .soft { color: #8f8f8f; }
 }
 .edit-hint:hover { border-color: #555; }
 .code-pane:not(.idle) .edit-hint { opacity: 0; transform: translateY(6px); pointer-events: none; }
-.showcase-wrap { max-width: 1180px; margin: 0 auto; padding: 72px 24px 0; }
+.showcase-wrap { max-width: 1180px; margin: 0 auto; padding: 96px 24px 0; }
+.showcase-intro { text-align: center; margin: 0 0 24px; }
+.showcase-intro .sub { margin: 0 auto; max-width: 520px; }
 .maker-bar {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
   padding: 12px; border: 1px solid var(--line); border-bottom: 0; border-radius: 14px 14px 0 0; background: var(--panel);
@@ -291,7 +293,7 @@ details p { color: #cfcfcf; margin: 10px 0 0; }
   .hero { padding-top: 32px; }
   .ctas .ghost { display: none; }
   .showcase { border-radius: 10px; }
-  .showcase-wrap { padding-top: 40px; }
+  .showcase-wrap { padding-top: 64px; }
   .nav-links a:not(.btn) { display: none; }
   .mobile-note { display: block; }
   .panes { grid-template-columns: 1fr; height: auto; }
