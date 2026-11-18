@@ -46,7 +46,7 @@ jobs:
       - name: Check koffi is packaged
         run: |
           APP=dist/mac-arm64/CodeWidget.app/Contents
-          ELECTRON_RUN_AS_NODE=1 "$APP/MacOS/CodeWidget" -e "const k=require(process.argv[1]+'/node_modules/koffi');const o=k.load('/usr/lib/libobjc.A.dylib');if(!o.func('sel_registerName','uint64_t',['str'])('window'))process.exit(1);console.log('koffi loads on Apple silicon')" "$APP/Resources/app.asar"
+          ELECTRON_RUN_AS_NODE=1 "$APP/MacOS/CodeWidget" -e "const k=require(process.argv[1]+'/node_modules/koffi');const o=k.load('/usr/lib/libobjc.A.dylib');if(!o.func('sel_registerName','uint64_t',['str'])('window'))process.exit(1);console.log('koffi loads on Apple silicon')" "$PWD/$APP/Resources/app.asar"
           ls dist/mac/CodeWidget.app/Contents/Resources/app.asar.unpacked/node_modules/@koromix/ | grep darwin-x64
       # Ad hoc signing, so the app opens after "Open Anyway" instead of being reported as damaged.
       - name: Sign ad hoc
