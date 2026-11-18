@@ -16,6 +16,9 @@ contextBridge.exposeInMainWorld("cw", {
   copy: (text) => ipcRenderer.invoke("clipboard:write", text),
   settings: () => ipcRenderer.invoke("settings:get"),
   setOpenAtLogin: (on) => ipcRenderer.invoke("settings:setOpenAtLogin", on),
+  update: () => ipcRenderer.invoke("update:get"),
+  openUpdate: () => ipcRenderer.invoke("update:open"),
+  onUpdate: (fn) => ipcRenderer.on("update:available", (_e, u) => fn(u)),
   onChanged: (fn) => ipcRenderer.on("widgets:changed", () => fn()),
   onEdit: (fn) => ipcRenderer.on("editor:edit", (_e, id) => fn(id)),
 });

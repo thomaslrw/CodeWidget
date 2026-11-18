@@ -46,6 +46,7 @@ header {
   padding: 7px 12px; cursor: pointer;
 }
 .btn:hover { border-color: #555; }
+.btn.small { padding: 3px 10px; font-size: 12px; }
 .btn.primary { background: #f2f2f2; color: #0b0b0b; border-color: #f2f2f2; font-weight: 600; }
 .btn.primary:hover { background: #fff; }
 .link { background: none; border: 0; color: var(--sub); cursor: pointer; padding: 0; }
@@ -79,6 +80,9 @@ textarea::placeholder { color: #5d5d5d; }
 
 footer { border-top: 1px solid var(--line); padding: 10px 16px 14px; }
 .list-head { display: flex; align-items: center; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
+.update { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--sub); }
+.update b { color: var(--text); font-weight: 600; }
+.update[hidden] { display: none; }
 .list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
 .empty { color: var(--sub); }
 .item {
