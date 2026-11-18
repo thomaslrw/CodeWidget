@@ -37,6 +37,20 @@ test("a drop near another widget lines up with it", () => {
   assert.deepStrictEqual(snap({ x: 607, y: 522, w: 300, h: 200 }, area, [other]), { x: 600, y: 516 });
 });
 
-test("a drop far from everything stays where it was put", () => {
-  assert.deepStrictEqual(snap({ x: 500, y: 400, w: 200, h: 200 }, area, []), { x: 500, y: 400 });
+test("a drop in open space snaps to the desktop grid", () => {
+  // Grid starts 16px in from the top left of the work area (x 16, y 41) and steps every 16px.
+  assert.deepStrictEqual(snap({ x: 503, y: 402, w: 200, h: 200 }, area, []), { x: 496, y: 409 });
+});
+
+test("a drop on top of another widget moves to the nearest free spot", () => {
+  const other = { x: 400, y: 300, w: 400, h: 200 };
+  const s = snap({ x: 420, y: 320, w: 200, h: 200 }, area, [other]);
+  const hit = s.x < other.x + other.w + 16 && s.x + 200 + 16 > other.x && s.y < other.y + other.h + 16 && s.y + 200 + 16 > other.y;
+  assert.ok(!hit, JSON.stringify(s));
+  assert.ok(Math.hypot(s.x - 420, s.y - 320) < 260, "stays close to where it was dropped");
+});
+
+test("a drop half off the screen is pulled back on", () => {
+  const s = snap({ x: 1300, y: 800, w: 400, h: 200 }, area, []);
+  assert.deepStrictEqual(s, { x: 1024, y: 659 });
 });
