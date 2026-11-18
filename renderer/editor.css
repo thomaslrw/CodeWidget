@@ -7,8 +7,8 @@
   --field: #1b1b1b;
 }
 * { box-sizing: border-box; }
-/* Dark, thin scrollbars to match the website (the default white ones stood out). */
-:root { color-scheme: dark; }
+/* Dark, thin scrollbars to match the website (the default white ones stood out).
+   No color-scheme: dark here: it makes Chromium paint a white box behind the transparent preview. */
 * { scrollbar-width: thin; scrollbar-color: #2a2a2a transparent; }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
