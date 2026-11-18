@@ -226,7 +226,8 @@ h3 { margin: 0 0 6px; font-size: 17px; }
   background: #f2f2f2; color: #0a0a0a; font-weight: 700; font-size: 14px;
 }
 .os { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 14px; }
-.os-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #9a9a9a; border: 1px solid var(--line); border-radius: 99px; padding: 4px 11px; }
+.os-pill { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; color: #9a9a9a; background: none; border: 1px solid var(--line); border-radius: 99px; padding: 4px 11px; cursor: pointer; transition: color .15s, border-color .15s; }
+.os-pill:hover { color: #e6e6e6; border-color: #3a3a3a; }
 .os-pill svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .os-pill.on { color: #f2f2f2; border-color: #555; background: rgba(255,255,255,0.05); }
 .version { color: var(--sub); font-size: 13px; margin-left: 4px; }

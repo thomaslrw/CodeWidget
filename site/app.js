@@ -197,34 +197,46 @@ const INSTALL = {
     </ol>`,
 };
 
-(async () => {
-  const os = await detect();
+// The detected computer is picked to start with. Clicking macOS, Windows or Linux switches the download,
+// so people can grab the version for another computer too.
+const other = (pairs) => pairs.map(([label, f]) => `<a href="${fileUrl(f)}">${label}</a>`).join(" &middot; ");
+let detected = "unknown";
+
+function choose(os, auto) {
   const btn = $("dlBtn");
-  const other = (pairs) => pairs.map(([label, f]) => `<a href="${fileUrl(f)}">${label}</a>`).join(" &middot; ");
-  if (os === "unknown") {
-    $("dlText").textContent = "Pick your computer:";
-    btn.textContent = "See all downloads";
-    btn.href = `${REPO}/releases/latest`;
-    $("dlOther").innerHTML = other([
-      ["Mac (Apple silicon)", FILES.macArm],
-      ["Mac (Intel)", FILES.macIntel],
-      ["Windows", FILES.windows],
-      ["Linux", FILES.linux],
-    ]);
-    $("installSteps").innerHTML = INSTALL.mac;
-    return;
+  for (const p of document.querySelectorAll(".os-pill")) {
+    const on = p.dataset.os === (os.startsWith("mac") ? "mac" : os);
+    p.classList.toggle("on", on);
+    p.setAttribute("aria-pressed", on);
   }
-  const pill = document.querySelector(`.os-pill[data-os="${os.startsWith("mac") ? "mac" : os}"]`);
-  if (pill) pill.classList.add("on");
   btn.textContent = LABELS[os];
   btn.href = fileUrl(FILES[os]);
-  // The download button at the bottom of the page gets the same file.
-  for (const a of document.querySelectorAll("[data-direct]")) a.href = btn.href;
-  for (const a of document.querySelectorAll("[data-download]")) a.textContent = LABELS[os].replace("Download for ", "Get it for ");
+  const name = { macArm: "Mac", macIntel: "Mac", windows: "Windows", linux: "Linux" }[os];
+  $("dlText").textContent = auto ? "We've picked the right version for your computer." : `The ${name} version.`;
   if (os === "macArm") $("dlOther").innerHTML = `Older Mac with an Intel chip? ${other([["Download the Intel version", FILES.macIntel]])}`;
-  if (os === "macIntel") $("dlOther").innerHTML = `Mac with an M chip? ${other([["Download the Apple silicon version", FILES.macArm]])}`;
-  if (os === "windows" || os === "linux") $("dlOther").innerHTML = `Other computers: ${other([["Mac", FILES.macArm], ["Windows", FILES.windows], ["Linux", FILES.linux]].filter(([, f]) => f !== FILES[os]))}`;
+  else if (os === "macIntel") $("dlOther").innerHTML = `Mac with an M chip? ${other([["Download the Apple silicon version", FILES.macArm]])}`;
+  else $("dlOther").textContent = "";
   $("installSteps").innerHTML = os.startsWith("mac") ? INSTALL.mac : INSTALL[os];
+}
+
+for (const p of document.querySelectorAll(".os-pill")) {
+  p.addEventListener("click", () => {
+    const os = p.dataset.os === "mac" ? (detected === "macIntel" ? "macIntel" : "macArm") : p.dataset.os;
+    choose(os, os === detected);
+  });
+}
+
+(async () => {
+  detected = await detect();
+  if (detected === "unknown") {
+    choose("macArm", false);
+    $("dlText").textContent = "Pick your computer above.";
+    return;
+  }
+  choose(detected, true);
+  // The download buttons elsewhere on the page get the file for this computer.
+  for (const a of document.querySelectorAll("[data-direct]")) a.href = fileUrl(FILES[detected]);
+  for (const a of document.querySelectorAll("[data-download]")) a.textContent = LABELS[detected].replace("Download for ", "Get it for ");
 })();
 
 // ---------- Add to desktop ----------
