@@ -188,6 +188,8 @@ const INSTALL = {
   if (pill) pill.classList.add("on");
   btn.textContent = LABELS[os];
   btn.href = fileUrl(FILES[os]);
+  // The download button at the bottom of the page gets the same file.
+  for (const a of document.querySelectorAll("[data-direct]")) a.href = btn.href;
   for (const a of document.querySelectorAll("[data-download]")) a.textContent = LABELS[os].replace("Download for ", "Get it for ");
   if (os === "macArm") $("dlOther").innerHTML = `Older Mac with an Intel chip? ${other([["Download the Intel version", FILES.macIntel]])}`;
   if (os === "macIntel") $("dlOther").innerHTML = `Mac with an M chip? ${other([["Download the Apple silicon version", FILES.macArm]])}`;

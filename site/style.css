@@ -206,9 +206,44 @@ kbd { font: 12px ui-monospace, Menlo, monospace; background: var(--field); borde
 .card p { margin: 0; color: #cfcfcf; }
 .features { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; color: #cfcfcf; }
 
+/* How it works: three steps in a row, then four small tiles. */
+.flow { list-style: none; padding: 0; margin: 24px 0 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.flow li { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+.flow .n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #f2f2f2; color: #0a0a0a; font-weight: 700; font-size: 12px; margin-bottom: 10px; }
+.flow p { margin: 0; color: #bdbdbd; font-size: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.tile { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; }
+.tile svg { width: 18px; height: 18px; fill: none; stroke: #cfcfcf; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 6px; }
+.tile b { font-size: 14px; }
+.tile span { color: var(--sub); font-size: 13px; }
+
+/* Download: one card, with the extras folded away. */
+.dl-card { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); overflow: hidden; }
+.dl-main { padding: 24px; }
+.dl-text { color: #cfcfcf; margin: 0 0 14px; }
+.dl-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.dl-side { padding: 12px 24px; border-left: 1px solid var(--line); display: flex; flex-direction: column; justify-content: center; }
+.dl-side ol { margin: 4px 0 10px; padding-left: 20px; color: #cfcfcf; font-size: 14px; }
+.dl-side ol li { margin-bottom: 4px; }
+.dl-side p { color: #cfcfcf; font-size: 14px; margin: 0 0 10px; }
+.fold + .fold { border-top: 1px solid var(--line); }
+
+/* Questions: plain rows, a + that turns into an x. */
+.faq { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; margin-top: 14px; align-items: start; }
 details { border-bottom: 1px solid var(--line); padding: 14px 0; }
-summary { cursor: pointer; font-weight: 600; }
+summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--sub); font-size: 20px; font-weight: 400; line-height: 1; transition: transform .2s ease; flex: none; }
+details[open] summary::after { transform: rotate(45deg); }
+details p, details ol { animation: open .25s ease; }
+@keyframes open { from { opacity: 0; transform: translateY(-4px); } }
 details p { color: #cfcfcf; margin: 10px 0 0; }
+.dl-side details:last-child { border-bottom: 0; }
+
+/* The final call to action. */
+.final { text-align: center; max-width: 920px; margin: 0 auto; padding: 72px 24px 80px; }
+.final h2 { font-size: clamp(30px, 4vw, 44px); letter-spacing: -0.035em; }
+.final .ctas { margin-top: 22px; }
 
 .footer a { color: #cfcfcf; text-decoration: none; }
 .footer a:hover { color: #fff; }
@@ -230,7 +265,15 @@ details p { color: #cfcfcf; margin: 10px 0 0; }
   .panes { grid-template-columns: 1fr; height: auto; }
   .pane:first-child { border-right: 0; border-bottom: 1px solid var(--line); }
   textarea { flex: none; height: 220px; }
-  .cards, .features { grid-template-columns: 1fr; }
+  .cards, .features, .flow, .faq, .dl-card { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: 1fr 1fr; }
+  .flow { gap: 10px; }
+  .flow li { display: grid; grid-template-columns: 24px 1fr; column-gap: 12px; padding: 14px; }
+  .flow .n { grid-row: span 2; margin: 0; }
+  .flow h3 { margin: 0 0 2px; }
+  .flow p { font-size: 13px; }
+  .dl-side { border-left: 0; border-top: 1px solid var(--line); }
+  .final .ctas .ghost { display: inline-block; }
   /* Phones: the two examples side by side, smaller. */
   .examples { grid-template-columns: 1fr 1fr; gap: 10px; }
   .example { border-radius: 12px; }

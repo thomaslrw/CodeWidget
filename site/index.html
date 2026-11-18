@@ -111,67 +111,68 @@
   <div class="examples" id="exampleList"></div>
 </section>
 
-<section class="reveal section" id="download">
-  <h2>Add it to your desktop</h2>
-  <p class="sub">Widgets live on your desktop through the free CodeWidget app. Three steps, once.</p>
-  <ol class="steps">
-    <li>
-      <div class="num">1</div>
-      <div>
-        <h3>Download CodeWidget</h3>
-        <p id="dlText">We've picked the right version for your computer.</p>
-        <div class="os">
-          <span class="os-pill" data-os="mac"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M1 19h22"/></svg>macOS</span>
-          <span class="os-pill" data-os="windows"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Windows</span>
-          <span class="os-pill" data-os="linux"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M7 8l3 2-3 2M12 12h4"/></svg>Linux</span>
-          <span class="version" id="version"></span>
-        </div>
-        <a class="btn" id="dlBtn" href="https://github.com/thomaslrw/CodeWidget/releases/latest">Download</a>
-        <p class="small muted" id="dlOther"></p>
-      </div>
-    </li>
-    <li>
-      <div class="num">2</div>
-      <div>
-        <h3>Install it</h3>
-        <div id="installSteps"></div>
-      </div>
-    </li>
-    <li>
-      <div class="num">3</div>
-      <div>
-        <h3>Open your widget in the app</h3>
-        <p>Your code goes straight into CodeWidget. Press <b>Add widget</b> and it's on your desktop.</p>
-        <button class="btn" id="openApp">Open my widget in CodeWidget</button>
-        <p class="small muted">If nothing happens, open CodeWidget and paste. Your code is copied when you press the button.</p>
-      </div>
-    </li>
-  </ol>
-</section>
-
 <section class="reveal section" id="how">
   <h2>How it works</h2>
-  <div class="cards">
-    <div class="card"><h3>Ask an AI</h3><p>Press <b>Copy AI prompt</b>, paste it into Claude or ChatGPT and say what you want: a habit tracker, a countdown, a to-do list, a clock.</p></div>
-    <div class="card"><h3>Paste and preview</h3><p>Paste the code it gives you. The preview shows it at its real size, working, straight away.</p></div>
-    <div class="card"><h3>Pin it</h3><p>Add it to your desktop. Move it, resize it, keep it on top. It remembers its data after a restart.</p></div>
+  <ol class="flow">
+    <li><span class="n">1</span><h3>Ask an AI</h3><p>Copy the prompt, paste it into Claude or ChatGPT and say what you want.</p></li>
+    <li><span class="n">2</span><h3>Paste and preview</h3><p>Paste the code here. It runs live at its real size.</p></li>
+    <li><span class="n">3</span><h3>Pin it</h3><p>Add it to your desktop. Move it, resize it, keep it on top.</p></li>
+  </ol>
+  <div class="tiles">
+    <div class="tile"><svg viewBox="0 0 24 24"><path d="M4 12h3l2-5 4 10 2-5h5"/></svg><b>Fully interactive</b><span>Buttons, inputs, live data</span></div>
+    <div class="tile"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M14 20v-6h6"/></svg><b>Any size</b><span>Drag the corner to fit</span></div>
+    <div class="tile"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/></svg><b>Sandboxed</b><span>Can't touch your files</span></div>
+    <div class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6M3 3l18 18"/></svg><b>No account</b><span>Nothing to sign up for</span></div>
   </div>
-  <ul class="features">
-    <li><b>Fully interactive.</b> Buttons, inputs, animations, live data from the web.</li>
-    <li><b>Any size.</b> Pick a size here, then drag the corner on your desktop to fine-tune it.</li>
-    <li><b>Sandboxed.</b> Widget code can't touch your files or run commands.</li>
-    <li><b>No account.</b> Nothing to sign up for. Your widgets stay on your computer.</li>
-  </ul>
+</section>
+
+<section class="reveal section" id="download">
+  <h2>Get CodeWidget</h2>
+  <p class="sub">Free for Mac, Windows and Linux. Widgets live on your desktop through the app.</p>
+  <div class="dl-card">
+    <div class="dl-main">
+      <div class="os">
+        <span class="os-pill" data-os="mac"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M1 19h22"/></svg>macOS</span>
+        <span class="os-pill" data-os="windows"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Windows</span>
+        <span class="os-pill" data-os="linux"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M7 8l3 2-3 2M12 12h4"/></svg>Linux</span>
+      </div>
+      <p id="dlText" class="dl-text">We've picked the right version for your computer.</p>
+      <div class="dl-row"><a class="btn big" id="dlBtn" href="https://github.com/thomaslrw/CodeWidget/releases/latest">Download</a><span class="version" id="version"></span></div>
+      <p class="small muted" id="dlOther"></p>
+    </div>
+    <div class="dl-side">
+      <details class="fold">
+        <summary>First time opening it? One quick step</summary>
+        <div id="installSteps"></div>
+      </details>
+      <details class="fold">
+        <summary>Made a widget on this page? Send it to the app</summary>
+        <p>Your code goes straight into CodeWidget. Press <b>Add widget</b> and it's on your desktop.</p>
+        <button class="btn ghost" id="openApp">Open my widget in CodeWidget</button>
+        <p class="small muted">If nothing happens, open CodeWidget and paste. Your code is copied when you press the button.</p>
+      </details>
+    </div>
+  </div>
 </section>
 
 <section class="reveal section" id="faq">
   <h2>FAQ</h2>
-  <details><summary>Is it free?</summary><p>Yes. It's free and open source under the MIT licence. The code is on <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>.</p></details>
-  <details><summary>Which computers does it work on?</summary><p>Mac (Apple silicon and Intel), Windows and Linux. The download button picks the right one for you.</p></details>
-  <details><summary>Does it work on my phone?</summary><p>No. CodeWidget is for desktop computers. Phones only let App Store apps put widgets on the home screen.</p></details>
-  <details><summary>Why does my computer warn me when I open it?</summary><p>CodeWidget isn't signed by Apple or Microsoft yet, so your computer asks you to confirm the first time. The steps above show where to click. After that it opens normally.</p></details>
-  <details><summary>What code works?</summary><p>One HTML file with its CSS and JavaScript inside. Code copied straight from an AI chat works, even with the ``` marks around it.</p></details>
-  <details><summary>Is it safe to paste code from other people?</summary><p>Widget code runs in a sandbox, like a web page. It can't read your files, run commands or use your camera or microphone. Only paste code you're happy to run in a browser.</p></details>
+  <div class="faq">
+    <details><summary>Is it free?</summary><p>Yes. It's free and open source under the MIT licence. The code is on <a href="https://github.com/thomaslrw/CodeWidget" target="_blank" rel="noopener">GitHub</a>.</p></details>
+    <details><summary>Which computers does it work on?</summary><p>Mac (Apple silicon and Intel), Windows and Linux. The download button picks the right one for you.</p></details>
+    <details><summary>Does it work on my phone?</summary><p>No. CodeWidget is for desktop computers. Phones only let App Store apps put widgets on the home screen.</p></details>
+    <details><summary>Why does my computer warn me the first time?</summary><p>CodeWidget isn't signed by Apple or Microsoft yet, so your computer asks you to confirm once. "First time opening it?" above shows where to click.</p></details>
+    <details><summary>What code works?</summary><p>One HTML file with its CSS and JavaScript inside. Code copied straight from an AI chat works, even with the ``` marks around it.</p></details>
+  </div>
+</section>
+
+<section class="reveal final">
+  <h2>Your desktop, your widgets</h2>
+  <p class="sub">Free, open source, and ready in a minute.</p>
+  <div class="ctas">
+    <a class="btn big" href="#download" data-download data-direct>Download</a>
+    <a class="btn big ghost" href="#maker">Try it now</a>
+  </div>
 </section>
 
 <footer class="footer">
