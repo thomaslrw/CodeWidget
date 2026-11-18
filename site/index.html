@@ -49,6 +49,10 @@
 </header>
 
 <section class="reveal maker" id="maker">
+  <div class="maker-intro">
+    <h2>Make one right here</h2>
+    <p class="sub">This editor is live. Change the code or paste your own and the preview updates as you type.</p>
+  </div>
   <div class="maker-bar">
     <div class="bar-left">
       <input id="name" class="field" placeholder="Widget name" maxlength="60" spellcheck="false">
@@ -68,12 +72,13 @@
     </div>
   </div>
   <div class="panes">
-    <div class="pane">
-      <div class="pane-head"><span>Code</span><button id="clear" class="link">Clear</button></div>
-      <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste your widget code here"></textarea>
+    <div class="pane code-pane" id="codePane">
+      <div class="pane-head"><span class="ph-title">Code <span class="chip"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editable</span></span><span class="ph-actions"><button id="paste" class="link">Paste</button><button id="clear" class="link">Clear</button></span></div>
+      <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste your widget code here" aria-label="Widget code, editable"></textarea>
+      <button class="edit-hint" id="editHint" type="button"><svg viewBox="0 0 24 24"><path d="M9 4h6M12 4v16M9 20h6"/></svg>Click to edit, or paste your own code</button>
     </div>
     <div class="pane">
-      <div class="pane-head"><span>Preview</span><span id="previewSize" class="muted">400×200</span></div>
+      <div class="pane-head"><span class="ph-title"><span class="live"></span>Live preview</span><span id="previewSize" class="muted">400×200</span></div>
       <div class="stage" id="stage">
         <div class="frame" id="frameBox">
           <iframe id="preview" title="Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox" allow="clipboard-write"></iframe>

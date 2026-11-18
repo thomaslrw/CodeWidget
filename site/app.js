@@ -116,6 +116,31 @@ preset.addEventListener("change", () => {
   layout();
 });
 window.addEventListener("resize", layout);
+// Make it obvious the editor is real: a hint and a soft glow until the first click or keypress.
+const codePane = $("codePane");
+codePane.classList.add("idle");
+const woke = () => codePane.classList.remove("idle");
+code.addEventListener("focus", woke);
+code.addEventListener("input", woke);
+$("editHint").onclick = () => {
+  code.focus();
+  code.setSelectionRange(0, 0);
+  code.scrollTop = 0;
+};
+$("paste").onclick = async () => {
+  woke();
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) throw new Error("empty");
+    code.value = text;
+    changed();
+    code.focus();
+  } catch {
+    code.focus();
+    code.select();
+    toast(`Press ${/Mac/.test(navigator.platform) ? "Cmd" : "Ctrl"}+V to paste your code`);
+  }
+};
 $("clear").onclick = () => {
   code.value = "";
   changed();
