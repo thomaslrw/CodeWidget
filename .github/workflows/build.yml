@@ -37,8 +37,17 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # The runner is Apple silicon, so npm only fetched koffi's Apple silicon part. The Intel build needs its own.
+      - name: Add koffi for Intel Macs
+        run: npm install --no-save --force @koromix/koffi-darwin-x64@3.3.8
       - name: Package for Apple silicon and Intel
         run: npx electron-builder --mac dir --arm64 --x64
+      # Check the macOS desktop helper made it into both apps and loads.
+      - name: Check koffi is packaged
+        run: |
+          APP=dist/mac-arm64/CodeWidget.app/Contents
+          ELECTRON_RUN_AS_NODE=1 "$APP/MacOS/CodeWidget" -e "const k=require(process.argv[1]+'/node_modules/koffi');const o=k.load('/usr/lib/libobjc.A.dylib');if(!o.func('sel_registerName','uint64_t',['str'])('window'))process.exit(1);console.log('koffi loads on Apple silicon')" "$PWD/$APP/Resources/app.asar"
+          ls dist/mac/CodeWidget.app/Contents/Resources/app.asar.unpacked/node_modules/@koromix/ | grep darwin-x64
       # Ad hoc signing, so the app opens after "Open Anyway" instead of being reported as damaged.
       - name: Sign ad hoc
         run: |

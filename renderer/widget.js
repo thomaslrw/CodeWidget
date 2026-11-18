@@ -8,6 +8,12 @@ const show = (s) => s && topBtn.classList.toggle("active", !!s.onTop);
 window.cwFrame.info().then(show);
 window.cwFrame.onState(show);
 
+// Show the controls while the pointer is over the widget, including over the move handle.
+document.addEventListener("mouseover", () => document.body.classList.add("hover"));
+document.addEventListener("mousemove", () => document.body.classList.add("hover"));
+document.documentElement.addEventListener("mouseleave", () => window.cwFrame.pointerLeft());
+window.cwFrame.onPointerOut(() => document.body.classList.remove("hover"));
+
 topBtn.onclick = () => window.cwFrame.toggleTop();
 document.getElementById("edit").onclick = () => window.cwFrame.edit();
 document.getElementById("hide").onclick = () => window.cwFrame.hide();
