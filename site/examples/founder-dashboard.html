@@ -27,6 +27,7 @@
       <g id="grid"></g>
       <path id="area" fill="url(#fill)" />
       <path id="path" fill="none" stroke="url(#line)" stroke-width="2.5" stroke-linecap="round" />
+      <path id="shine" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" pathLength="100" />
     </svg>
     <div class="dot" id="dot"></div>
     <div class="months" id="months"></div>
@@ -83,6 +84,13 @@
   #path { filter: drop-shadow(0 0 6px rgba(123, 140, 255, 0.6)); stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 1.6s ease forwards; }
   #area { opacity: 0; animation: fade 1s .6s ease forwards; }
   @keyframes draw { to { stroke-dashoffset: 0; } }
+  #shine { stroke-dasharray: 8 200; stroke-dashoffset: 8; opacity: 0; filter: drop-shadow(0 0 4px #fff); animation: shine 6s ease-in-out 2s infinite; }
+  @keyframes shine {
+    0% { stroke-dashoffset: 8; opacity: 0; }
+    10% { opacity: .55; }
+    50% { stroke-dashoffset: -92; opacity: .55; }
+    56%, 100% { stroke-dashoffset: -92; opacity: 0; }
+  }
   @keyframes fade { to { opacity: 1; } }
   .dot { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #c7b8ff; box-shadow: 0 0 0 4px rgba(181, 156, 255, 0.2), 0 0 14px #b59cff; animation: pulse 2s infinite; opacity: 0; }
   @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(181, 156, 255, 0.2), 0 0 14px #b59cff; } 50% { box-shadow: 0 0 0 9px rgba(181, 156, 255, 0), 0 0 14px #b59cff; } }
@@ -150,6 +158,7 @@
     const pts = m.map((v, i) => [m.length === 1 ? W : (i / (m.length - 1)) * W, H - pad - (v / max) * (H - pad * 2)]);
     const line = smooth(pts);
     $("path").setAttribute("d", line);
+    $("shine").setAttribute("d", line);
     $("area").setAttribute("d", `${line} L${W},${H} L0,${H} Z`);
     $("grid").innerHTML = [0.25, 0.5, 0.75].map((f) => `<line x1="0" x2="${W}" y1="${H * f}" y2="${H * f}" />`).join("");
     const last = pts[pts.length - 1];

@@ -46,17 +46,9 @@
 <style>
   * { box-sizing: border-box; }
   html, body { height: 100%; }
-  /* The radar sweep: a red line with a fading tail travelling round the edge of the card. */
-  .frame { position: relative; height: 100vh; border-radius: 20px; padding: 2px; overflow: hidden; background: #262022; }
-  .frame::before {
-    content: ""; position: absolute; left: 50%; top: 50%; width: 300%; height: 300%;
-    transform: translate(-50%, -50%) rotate(0deg);
-    background: conic-gradient(from 0deg, transparent 0deg 250deg, rgba(242, 85, 90, 0.15) 300deg, rgba(242, 85, 90, 0.65) 345deg, #ff8a8d 360deg);
-    animation: sweep 4s linear infinite;
-  }
-  @keyframes sweep { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  .frame { height: 100vh; }
   .w {
-    position: relative; height: 100%; border-radius: 18px; background: #000; color: #eef2ef; overflow: hidden;
+    position: relative; height: 100%; border-radius: 20px; background: #000; color: #eef2ef; overflow: hidden; border: 1px solid #1f1f1f;
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif; display: flex; flex-direction: column; gap: 10px; padding: 16px;
   }
   .head { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -84,7 +76,8 @@
   .bar i { display: block; border-radius: 2px 2px 0 0; }
   .bar .e { background: #f2555a; }
   .bar .wn { background: #f5b544; opacity: .85; border-radius: 0; }
-  .bar.now .e { box-shadow: 0 0 10px rgba(242, 85, 90, .6); }
+  .bar.now .e { box-shadow: 0 0 10px rgba(242, 85, 90, .6); animation: breathe 2.4s ease-in-out infinite; }
+  @keyframes breathe { 50% { box-shadow: 0 0 18px rgba(242, 85, 90, .9); filter: brightness(1.25); } }
   .bar .spark { position: absolute; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #f2555a; box-shadow: 0 0 8px #f2555a; animation: pulse 1.2s infinite; }
   .axis { display: flex; justify-content: space-between; color: #6f7873; font-size: 10px; padding-top: 4px; }
 

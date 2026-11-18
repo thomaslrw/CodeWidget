@@ -5,13 +5,14 @@
     <button id="refresh" title="Refresh">↻</button>
   </div>
   <div class="list" id="list"><div class="msg">Loading...</div></div>
+  <div class="tick"><i id="tick"></i></div>
 </div>
 <style>
   * { box-sizing: border-box; }
   .w {
     height: 100vh; padding: 16px; border-radius: 20px; background: #000; color: #f0f1f3;
     font-family: -apple-system, "Segoe UI", system-ui, sans-serif; display: flex; flex-direction: column; gap: 10px;
-    border: 1px solid #3a2a1c; overflow: hidden;
+    border: 1px solid #3a2a1c; overflow: hidden; position: relative;
   }
   .head { display: flex; justify-content: space-between; align-items: center; }
   .t { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
@@ -28,6 +29,9 @@
   .rank { color: #ff8a3d; font-weight: 700; font-size: 12px; width: 16px; flex: none; padding-top: 1px; }
   .title { font-size: 13px; line-height: 1.35; }
   .meta { color: #8a8d95; font-size: 11px; margin-top: 3px; }
+  .tick { position: absolute; left: 16px; right: 16px; bottom: 8px; height: 2px; border-radius: 1px; background: #15161a; overflow: hidden; }
+  .tick i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, rgba(255, 138, 61, 0.2), #ff8a3d); }
+  .tick i.run { width: 100%; transition: width 900s linear; }
   .msg { color: #8a8d95; font-size: 13px; padding: 10px 4px; }
 </style>
 <script>
@@ -67,6 +71,11 @@
       list.innerHTML = '<div class="msg">Couldn\'t load the news. Check your connection and press ↻.</div>';
     }
     btn.classList.remove("spin");
+    // Restart the hairline that fills up over the 15 minutes to the next refresh.
+    const tick = document.getElementById("tick");
+    tick.classList.remove("run");
+    void tick.offsetWidth;
+    tick.classList.add("run");
   }
   btn.onclick = load;
   load();
