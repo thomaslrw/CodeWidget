@@ -185,6 +185,7 @@ const INSTALL = {
       <li>Open CodeWidget. Your Mac says <i>"Apple could not verify..."</i>. Click <b>Done</b>.</li>
       <li>Open <b>System Settings</b>, go to <b>Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b> next to CodeWidget.</li>
       <li>Enter your password. You only do this once.</li>
+      <li>If your widgets disappear when you click the desktop, open <b>System Settings</b>, go to <b>Desktop &amp; Dock</b> and set <b>Click wallpaper to reveal desktop</b> to <b>Only in Stage Manager</b>.</li>
     </ol>`,
   windows: `<ol>
       <li>Open the downloaded file.</li>
